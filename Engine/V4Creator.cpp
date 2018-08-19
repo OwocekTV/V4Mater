@@ -46,6 +46,11 @@ void V4Creator::Init()
                 {
                     mouseLeftClick = true;
                 }
+
+                if(event.mouseButton.button == sf::Mouse::Right)
+                {
+                    mouseRightClick = true;
+                }
             }
 
             if(event.type == sf::Event::MouseButtonReleased)
@@ -53,6 +58,11 @@ void V4Creator::Init()
                 if(event.mouseButton.button == sf::Mouse::Left)
                 {
                     mouseLeftClick = false;
+                }
+
+                if(event.mouseButton.button == sf::Mouse::Right)
+                {
+                    mouseRightClick = false;
                 }
             }
         }
@@ -67,6 +77,7 @@ void V4Creator::Init()
         editor.mouseX = mouseX;
         editor.mouseY = mouseY;
         editor.mouseLeftClick = mouseLeftClick;
+        editor.mouseRightClick = mouseRightClick;
         editor.Draw(window);
 
         window.display();

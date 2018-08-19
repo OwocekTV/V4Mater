@@ -19,6 +19,7 @@ class V4Creator
     public:
     int mouseX,mouseY;
     bool mouseLeftClick = false;
+    bool mouseRightClick = false;
 
     V4Creator();
     void Init();

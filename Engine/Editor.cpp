@@ -23,6 +23,10 @@ Editor::Editor()
     t_loadfile.setString("Load file");
     t_loadfile.setCharacterSize(40);
     t_loadfile.setColor(sf::Color::Black);
+
+    shape.setRadius(40);
+    shape.setFillColor(sf::Color::Black);
+    shape.setPosition(500,500);
 }
 
 string Editor::OpenArchiveFile()
@@ -204,5 +208,42 @@ void Editor::Draw(sf::RenderWindow& window)
         }
 
         state = 0;
+    }
+
+    if(state == 3)
+    {
+        if(mouseRightClick == true)
+        {
+            if(isAlreadyClicked == false)
+            {
+                RMB_x = mouseX;
+                RMB_y = mouseY;
+
+                isAlreadyClicked = true;
+            }
+        }
+
+        if(isAlreadyClicked == true)
+        {
+            x_distance = RMB_x - mouseX;
+            y_distance = RMB_y - mouseY;
+
+            shape.setPosition(shape_x-x_distance,shape_y-y_distance);
+
+            cout << "Distance moved: " << x_distance << " x " << y_distance << endl;
+        }
+
+        if(mouseRightClick == false)
+        {
+            shape_x = shape_x - x_distance;
+            shape_y = shape_y - y_distance;
+
+            x_distance = 0;
+            y_distance = 0;
+
+            isAlreadyClicked = false;
+        }
+
+        window.draw(shape);
     }
 }
