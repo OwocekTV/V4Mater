@@ -74,10 +74,12 @@ void V4Creator::Init()
 
         window.clear(sf::Color::White);
 
+        editor.keyMap = keyMap;
         editor.mouseX = mouseX;
         editor.mouseY = mouseY;
         editor.mouseLeftClick = mouseLeftClick;
         editor.mouseRightClick = mouseRightClick;
+        editor.fps = fps;
         editor.Draw(window);
 
         window.display();

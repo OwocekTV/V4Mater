@@ -26,7 +26,16 @@ Editor::Editor()
 
     shape.setRadius(40);
     shape.setFillColor(sf::Color::Black);
+    shape.setOrigin(shape.getGlobalBounds().width/2,shape.getGlobalBounds().height/2);
     shape.setPosition(500,500);
+
+    t_curframes.setFont(font);
+    t_curframes.setCharacterSize(40);
+    t_curframes.setColor(sf::Color::Black);
+
+    r_outline.setOutlineThickness(2);
+    r_outline.setFillColor(sf::Color(0,0,0,0));
+    r_outline.setOutlineColor(sf::Color::Black);
 }
 
 string Editor::OpenArchiveFile()
@@ -228,7 +237,7 @@ void Editor::Draw(sf::RenderWindow& window)
             x_distance = RMB_x - mouseX;
             y_distance = RMB_y - mouseY;
 
-            shape.setPosition(shape_x-x_distance,shape_y-y_distance);
+            shape.setPosition(shape_x-x_distance+shape_ax,shape_y-y_distance+shape_ay);
 
             cout << "Distance moved: " << x_distance << " x " << y_distance << endl;
         }
@@ -244,6 +253,101 @@ void Editor::Draw(sf::RenderWindow& window)
             isAlreadyClicked = false;
         }
 
+        if(mouseLeftClick == true)
+        {
+            if(mouseX >= shape_x-shape.getGlobalBounds().width/2)
+            {
+                if(mouseX <= shape_x+shape.getGlobalBounds().width/2)
+                {
+                    if(mouseY >= shape_y-shape.getGlobalBounds().height/2)
+                    {
+                        if(mouseY <= shape_y+shape.getGlobalBounds().height/2)
+                        {
+                            cout << "Shape is clicked" << endl;
+                            r_outline.setSize(sf::Vector2f(shape.getGlobalBounds().width,shape.getGlobalBounds().height));
+                            r_outline.setOrigin(r_outline.getGlobalBounds().width/2,r_outline.getGlobalBounds().height/2);
+                            r_outline.setPosition(shape_x+2,shape_y+2);
+
+                            if(moveObject == false)
+                            {
+                                //shape.setOrigin(mouseX,mouseY);
+                            }
+
+                            moveObject = true;
+                            selected = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if(selected == true)
+        {
+            r_outline.setSize(sf::Vector2f(shape.getGlobalBounds().width,shape.getGlobalBounds().height));
+            r_outline.setOrigin(r_outline.getGlobalBounds().width/2,r_outline.getGlobalBounds().height/2);
+            r_outline.setPosition(shape_x+2,shape_y+2);
+        }
+
+        if(moveObject == true)
+        {
+            shape_x = mouseX;
+            shape_y = mouseY;
+
+            shape.setPosition(shape_x-x_distance+shape_ax,shape_y-y_distance+shape_ay);
+
+            if(mouseLeftClick == false)
+            {
+                shape.setOrigin(shape.getGlobalBounds().width/2,shape.getGlobalBounds().height/2);
+                moveObject = false;
+            }
+        }
+
         window.draw(shape);
+        window.draw(r_outline);
+
+        if(keyMap[sf::Keyboard::Space] == true)
+        {
+            if(play == true)
+            {
+                play = false;
+            }
+            else
+            {
+                play = true;
+            }
+        }
+
+        if(keyMap[sf::Keyboard::Left] == true)
+        {
+            frames -= 1;
+
+            if(frames < 0)
+            {
+                frames = max_frames;
+            }
+        }
+
+        if(keyMap[sf::Keyboard::Right] == true)
+        {
+            frames += 1;
+
+            if(frames > max_frames)
+            frames = 0;
+        }
+
+        if(play == true)
+        {
+            f_frames += float(60) / fps;
+
+            if(f_frames > max_frames)
+            {
+                f_frames = 0;
+            }
+
+            frames = floor(f_frames);
+        }
+
+        t_curframes.setString("Frame "+to_string(int(frames)));
+        window.draw(t_curframes);
     }
 }
