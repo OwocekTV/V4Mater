@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "P4A.h"
+#include "Object.h"
 
 class Editor
 {
@@ -19,30 +20,20 @@ class Editor
     int mouseX,mouseY;
     bool mouseLeftClick = false;
     bool mouseRightClick = false;
+    bool isRightClicked = false;
+    int RMB_x = 0, RMB_y = 0;
+    int distance_x = 0,distance_y = 0;
+    int camera_x = 0,camera_y = 0;
+    int oldcamera_x = 0,oldcamera_y = 0;
 
-    bool isAlreadyClicked = false;
-    int RMB_x = 0;
-    int RMB_y = 0;
-
-    sf::CircleShape shape;
-    float shape_x = 500; ///for camera
-    float shape_y = 500;
-
-    float shape_ax = 0; ///for animation
-    float shape_ay = 0;
-
-    float x_distance = 0;
-    float y_distance = 0;
+    sf::View view;
 
     float f_frames = 0;
     int frames = 0;
     int max_frames = 60;
     bool play = false;
-    bool selected = false;
-    bool moveObject = false;
-    bool isClicked = false;
-    int LMB_x = 0;
-    int LMB_y = 0;
+
+    Object obj_test;
 
     sf::RectangleShape r_outline;
 

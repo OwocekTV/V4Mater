@@ -24,11 +24,6 @@ Editor::Editor()
     t_loadfile.setCharacterSize(40);
     t_loadfile.setColor(sf::Color::Black);
 
-    shape.setRadius(40);
-    shape.setFillColor(sf::Color::Black);
-    shape.setOrigin(shape.getGlobalBounds().width/2,shape.getGlobalBounds().height/2);
-    shape.setPosition(500,500);
-
     t_curframes.setFont(font);
     t_curframes.setCharacterSize(40);
     t_curframes.setColor(sf::Color::Black);
@@ -36,6 +31,10 @@ Editor::Editor()
     r_outline.setOutlineThickness(2);
     r_outline.setFillColor(sf::Color(0,0,0,0));
     r_outline.setOutlineColor(sf::Color::Black);
+
+    obj_test.Load("image.jpg");
+
+    view.setSize(1280,720);
 }
 
 string Editor::OpenArchiveFile()
@@ -221,90 +220,6 @@ void Editor::Draw(sf::RenderWindow& window)
 
     if(state == 3)
     {
-        if(mouseRightClick == true)
-        {
-            if(isAlreadyClicked == false)
-            {
-                RMB_x = mouseX;
-                RMB_y = mouseY;
-
-                isAlreadyClicked = true;
-            }
-        }
-
-        if(isAlreadyClicked == true)
-        {
-            x_distance = RMB_x - mouseX;
-            y_distance = RMB_y - mouseY;
-
-            shape.setPosition(shape_x-x_distance+shape_ax,shape_y-y_distance+shape_ay);
-
-            cout << "Distance moved: " << x_distance << " x " << y_distance << endl;
-        }
-
-        if(mouseRightClick == false)
-        {
-            shape_x = shape_x - x_distance;
-            shape_y = shape_y - y_distance;
-
-            x_distance = 0;
-            y_distance = 0;
-
-            isAlreadyClicked = false;
-        }
-
-        if(mouseLeftClick == true)
-        {
-            if(mouseX >= shape_x-shape.getGlobalBounds().width/2)
-            {
-                if(mouseX <= shape_x+shape.getGlobalBounds().width/2)
-                {
-                    if(mouseY >= shape_y-shape.getGlobalBounds().height/2)
-                    {
-                        if(mouseY <= shape_y+shape.getGlobalBounds().height/2)
-                        {
-                            cout << "Shape is clicked" << endl;
-                            r_outline.setSize(sf::Vector2f(shape.getGlobalBounds().width,shape.getGlobalBounds().height));
-                            r_outline.setOrigin(r_outline.getGlobalBounds().width/2,r_outline.getGlobalBounds().height/2);
-                            r_outline.setPosition(shape_x+2,shape_y+2);
-
-                            if(moveObject == false)
-                            {
-                                //shape.setOrigin(mouseX,mouseY);
-                            }
-
-                            moveObject = true;
-                            selected = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        if(selected == true)
-        {
-            r_outline.setSize(sf::Vector2f(shape.getGlobalBounds().width,shape.getGlobalBounds().height));
-            r_outline.setOrigin(r_outline.getGlobalBounds().width/2,r_outline.getGlobalBounds().height/2);
-            r_outline.setPosition(shape_x+2,shape_y+2);
-        }
-
-        if(moveObject == true)
-        {
-            shape_x = mouseX;
-            shape_y = mouseY;
-
-            shape.setPosition(shape_x-x_distance+shape_ax,shape_y-y_distance+shape_ay);
-
-            if(mouseLeftClick == false)
-            {
-                shape.setOrigin(shape.getGlobalBounds().width/2,shape.getGlobalBounds().height/2);
-                moveObject = false;
-            }
-        }
-
-        window.draw(shape);
-        window.draw(r_outline);
-
         if(keyMap[sf::Keyboard::Space] == true)
         {
             if(play == true)
@@ -346,6 +261,45 @@ void Editor::Draw(sf::RenderWindow& window)
 
             frames = floor(f_frames);
         }
+
+        if(mouseRightClick)
+        {
+            distance_x = RMB_x - mouseX;
+            distance_y = RMB_y - mouseY;
+
+            cout << distance_x << " " << distance_y << endl;
+
+            camera_x = oldcamera_x + distance_x;
+            camera_y = oldcamera_y + distance_y;
+
+            if(isRightClicked == false)
+            {
+                RMB_x = mouseX;
+                RMB_y = mouseY;
+                isRightClicked = true;
+            }
+        }
+        else
+        {
+            camera_x = oldcamera_x + distance_x;
+            camera_y = oldcamera_y + distance_y;
+
+            distance_x = 0;
+            distance_y = 0;
+
+            oldcamera_x = camera_x;
+            oldcamera_y = camera_y;
+
+            isRightClicked = false;
+        }
+
+        view.setCenter(camera_x,camera_y);
+        window.setView(view);
+
+        obj_test.Draw(window);
+
+        auto def = window.getDefaultView();
+        window.setView(def);
 
         t_curframes.setString("Frame "+to_string(int(frames)));
         window.draw(t_curframes);
