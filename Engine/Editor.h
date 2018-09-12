@@ -21,10 +21,13 @@ class Editor
     bool mouseLeftClick = false;
     bool mouseRightClick = false;
     bool isRightClicked = false;
+    bool isLeftClicked = false;
     int RMB_x = 0, RMB_y = 0;
+    int LMB_x = 0, LMB_y = 0;
     int distance_x = 0,distance_y = 0;
-    int camera_x = 0,camera_y = 0;
-    int oldcamera_x = 0,oldcamera_y = 0;
+    int Ldistance_x = 0,Ldistance_y = 0;
+    int camera_x = 320,camera_y = 180;
+    int oldcamera_x = camera_x,oldcamera_y = camera_y;
 
     sf::View view;
 

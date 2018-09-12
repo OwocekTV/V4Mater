@@ -32,7 +32,8 @@ Editor::Editor()
     r_outline.setFillColor(sf::Color(0,0,0,0));
     r_outline.setOutlineColor(sf::Color::Black);
 
-    obj_test.Load("image.jpg");
+    obj_test.Load("head_1.png",max_frames);
+    obj_test.setFrame(0);
 
     view.setSize(1280,720);
 }
@@ -220,6 +221,9 @@ void Editor::Draw(sf::RenderWindow& window)
 
     if(state == 3)
     {
+        view.setCenter(camera_x,camera_y);
+        window.setView(view);
+
         if(keyMap[sf::Keyboard::Space] == true)
         {
             if(play == true)
@@ -240,6 +244,8 @@ void Editor::Draw(sf::RenderWindow& window)
             {
                 frames = max_frames;
             }
+
+            obj_test.setPos(frames,true);
         }
 
         if(keyMap[sf::Keyboard::Right] == true)
@@ -248,6 +254,8 @@ void Editor::Draw(sf::RenderWindow& window)
 
             if(frames > max_frames)
             frames = 0;
+
+            obj_test.setPos(frames,false);
         }
 
         if(play == true)
@@ -260,14 +268,19 @@ void Editor::Draw(sf::RenderWindow& window)
             }
 
             frames = floor(f_frames);
+
+            obj_test.setPos(frames,false);
+        }
+
+        if(keyMap[sf::Keyboard::R] == true)
+        {
+            obj_test.setFrame(frames);
         }
 
         if(mouseRightClick)
         {
             distance_x = RMB_x - mouseX;
             distance_y = RMB_y - mouseY;
-
-            cout << distance_x << " " << distance_y << endl;
 
             camera_x = oldcamera_x + distance_x;
             camera_y = oldcamera_y + distance_y;
@@ -293,8 +306,61 @@ void Editor::Draw(sf::RenderWindow& window)
             isRightClicked = false;
         }
 
-        view.setCenter(camera_x,camera_y);
-        window.setView(view);
+        int realMouseX = round(window.mapPixelToCoords(sf::Vector2i(mouseX,mouseY)).x);
+        int realMouseY = round(window.mapPixelToCoords(sf::Vector2i(mouseX,mouseY)).y);
+
+        if(realMouseX >= obj_test.x)
+        {
+            if(realMouseX <= obj_test.x+obj_test.s_object.getGlobalBounds().width)
+            {
+                if(realMouseY >= obj_test.y)
+                {
+                    if(realMouseY <= obj_test.y+obj_test.s_object.getGlobalBounds().height)
+                    {
+                        if(mouseLeftClick)
+                        {
+                            obj_test.selected = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if(obj_test.selected == true)
+        {
+            if(mouseLeftClick)
+            {
+                Ldistance_x = realMouseX - LMB_x;
+                Ldistance_y = realMouseY - LMB_y;
+
+                //cout << "L: " << Ldistance_x << " " << Ldistance_y << endl;
+
+                obj_test.x = obj_test.oldx + Ldistance_x;
+                obj_test.y = obj_test.oldy + Ldistance_y;
+
+                if(isLeftClicked == false)
+                {
+                    LMB_x = realMouseX;
+                    LMB_y = realMouseY;
+
+                    isLeftClicked = true;
+                }
+            }
+            else
+            {
+                obj_test.x = obj_test.oldx + Ldistance_x;
+                obj_test.y = obj_test.oldy + Ldistance_y;
+
+                Ldistance_x = 0;
+                Ldistance_y = 0;
+
+                obj_test.oldx = obj_test.x;
+                obj_test.oldy = obj_test.y;
+
+                obj_test.selected = false;
+                isLeftClicked = false;
+            }
+        }
 
         obj_test.Draw(window);
 
