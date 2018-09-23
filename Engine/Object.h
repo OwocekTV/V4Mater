@@ -9,6 +9,8 @@ class Object
     sf::Texture tex_object;
     sf::Sprite s_object;
 
+    sf::RectangleShape r_outline;
+
     float x=0,y=0;
     float oldx=x,oldy=y;
     int max_frames = 60;
@@ -19,11 +21,12 @@ class Object
     std::map<int,bool> frame_isset;
 
     bool selected = false;
+    bool outline = false;
 
     Object();
     void Load(std::string filename, int maxframes);
     void setFrame(int frame);
-    void setPos(int frame,bool rv);
+    void setPos(int frame, bool rv);
     void Draw(sf::RenderWindow& window);
 };
 

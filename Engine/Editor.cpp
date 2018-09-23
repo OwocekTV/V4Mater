@@ -320,6 +320,7 @@ void Editor::Draw(sf::RenderWindow& window)
                         if(mouseLeftClick)
                         {
                             obj_test.selected = true;
+                            obj_test.outline = true;
                         }
                     }
                 }
@@ -361,6 +362,19 @@ void Editor::Draw(sf::RenderWindow& window)
                 isLeftClicked = false;
             }
         }
+
+        sf::Vector2f curPos = obj_test.s_object.getPosition();
+        sf::Vector2f position = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
+        const float PI = 3.14159265;
+
+        float dx = curPos.x - position.x;
+        float dy = curPos.y - position.y;
+
+        float rotation = (atan2(dy, dx)) * 180 / PI;
+        cout << rotation << endl;
+
+        obj_test.s_object.setRotation(rotation);
 
         obj_test.Draw(window);
 

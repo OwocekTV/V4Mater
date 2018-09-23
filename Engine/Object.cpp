@@ -119,6 +119,18 @@ void Object::setPos(int frame, bool rv)
 
 void Object::Draw(sf::RenderWindow& window)
 {
+    r_outline.setSize(sf::Vector2f(s_object.getGlobalBounds().width,s_object.getGlobalBounds().height));
+    r_outline.setFillColor(sf::Color(0,0,0,0));
+    r_outline.setOutlineColor(sf::Color::Black);
+    r_outline.setOutlineThickness(-2);
+    r_outline.setOrigin(s_object.getOrigin().x,s_object.getOrigin().y);
+    r_outline.setPosition(x,y);
+
     s_object.setPosition(x,y);
     window.draw(s_object);
+
+    if(outline == true)
+    {
+        window.draw(r_outline);
+    }
 }
