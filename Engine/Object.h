@@ -14,19 +14,25 @@ class Object
     float x=0,y=0;
     float oldx=x,oldy=y;
     int max_frames = 60;
+    int keyframes_set = 0; ///for stats
 
-    std::map<int,int> frame_x;
-    std::map<int,int> frame_y;
+    std::map<int,int> keyframe_x;
+    std::map<int,int> keyframe_y;
+    std::map<int,float> keyframe_rot;
+    std::map<int,bool> keyframe_isset;
+
+    std::map<int,float> frame_x;
+    std::map<int,float> frame_y;
     std::map<int,float> frame_rot;
-    std::map<int,bool> frame_isset;
 
     bool selected = false;
     bool outline = false;
 
     Object();
     void Load(std::string filename, int maxframes);
+    void calculateAnimation();
     void setFrame(int frame);
-    void setPos(int frame, bool rv);
+    void setPos(int frame);
     void Draw(sf::RenderWindow& window);
 };
 

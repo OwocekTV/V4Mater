@@ -245,7 +245,7 @@ void Editor::Draw(sf::RenderWindow& window)
                 frames = max_frames;
             }
 
-            obj_test.setPos(frames,true);
+            obj_test.setPos(frames);
         }
 
         if(keyMap[sf::Keyboard::Right] == true)
@@ -255,7 +255,7 @@ void Editor::Draw(sf::RenderWindow& window)
             if(frames > max_frames)
             frames = 0;
 
-            obj_test.setPos(frames,false);
+            obj_test.setPos(frames);
         }
 
         if(play == true)
@@ -269,7 +269,7 @@ void Editor::Draw(sf::RenderWindow& window)
 
             frames = floor(f_frames);
 
-            obj_test.setPos(frames,false);
+            obj_test.setPos(frames);
         }
 
         if(keyMap[sf::Keyboard::R] == true)
@@ -363,7 +363,7 @@ void Editor::Draw(sf::RenderWindow& window)
             }
         }
 
-        sf::Vector2f curPos = obj_test.s_object.getPosition();
+        /*sf::Vector2f curPos = obj_test.s_object.getPosition();
         sf::Vector2f position = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
         const float PI = 3.14159265;
@@ -372,9 +372,13 @@ void Editor::Draw(sf::RenderWindow& window)
         float dy = curPos.y - position.y;
 
         float rotation = (atan2(dy, dx)) * 180 / PI;
-        cout << rotation << endl;
 
-        obj_test.s_object.setRotation(rotation);
+        float rotation2 = rotation;
+        if(rotation < 0)
+        rotation2 = 180+(180+rotation);
+        cout << rotation2 << endl;
+
+        obj_test.s_object.setRotation(rotation);*/
 
         obj_test.Draw(window);
 

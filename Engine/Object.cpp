@@ -17,104 +17,88 @@ void Object::Load(string filename, int maxframes)
     max_frames = maxframes;
 }
 
-void Object::setFrame(int frame)
+void Object::calculateAnimation()
 {
-    frame_x[frame] = x;
-    frame_y[frame] = y;
-    frame_rot[frame] = 0;
-    frame_isset[frame] = true;
-}
+    vector<int> keyframe_ID;
 
-void Object::setPos(int frame, bool rv)
-{
-    bool first_keyframe = false;
-    bool last_keyframe = false;
-
-    float first_x = 0;
-    float first_y = 0;
-    float first_rot = 0;
-    float first_set = false;
-    float first_id = 0;
-
-    float last_x = 0;
-    float last_y = 0;
-    float last_rot = 0;
-    float last_set = false;
-    float last_id = 0;
-
-    float original_x = frame_x[0];
-    float original_y = frame_y[0];
-
+    ///get all of the keyframe IDs first
     for(int i=0; i<max_frames; i++)
     {
-        if(first_keyframe == false)
+        if(keyframe_isset[i] == true)
         {
-            if(i <= frame)
+            keyframe_ID.push_back(i);
+        }
+    }
+
+    ///then, based on all positions, calculate!
+    /**
+    0 - keyframe = keyframe positions (x = 0)
+    1 - empty = calc positions (x = 5)
+    2 - empty = calc positions (x = 10)
+    3 - empty = calc positions (x = 15)
+    4 - keyframe = keyframe positions (x = 20)
+
+    get X of 0
+    get X of 4
+    divide by amount of frames inbetween
+    */
+
+    int buff = 0;
+    while(buff < keyframe_ID.size())
+    {
+        ///set the keyframe frames
+        frame_x[keyframe_ID[buff]] = keyframe_x[keyframe_ID[buff]];
+        frame_y[keyframe_ID[buff]] = keyframe_y[keyframe_ID[buff]];
+        frame_rot[keyframe_ID[buff]] = keyframe_rot[keyframe_ID[buff]];
+
+        ///check if the second frame exists
+        if(buff+1 < keyframe_ID.size())
+        {
+            ///get the frame difference
+            int framediff = keyframe_ID[buff+1] - keyframe_ID[buff];
+            float xdiff = (keyframe_x[keyframe_ID[buff+1]] - keyframe_x[keyframe_ID[buff]]) / framediff;
+            float ydiff = (keyframe_y[keyframe_ID[buff+1]] - keyframe_y[keyframe_ID[buff]]) / framediff;
+            float rotdiff = (keyframe_rot[keyframe_ID[buff+1]] - keyframe_rot[keyframe_ID[buff]]) / framediff;
+
+            int start_point = keyframe_ID[buff];
+
+            ///set all the other frames between to their respective positions
+            for(int i=1; i<=framediff; i++)
             {
-                if(frame_isset[i] == true)
-                {
-                    first_x = frame_x[i];
-                    first_y = frame_y[i];
-                    first_rot = frame_rot[i];
-                    first_set = true;
-                    first_id = i;
-                }
+                frame_x[start_point+i] = keyframe_x[start_point] + (xdiff*i);
+                frame_y[start_point+i] = keyframe_y[start_point] + (ydiff*i);
+                frame_rot[start_point+i] = keyframe_rot[start_point] + (rotdiff*i);
             }
-        }
-    }
 
-    if(first_set == true)
-    {
-        first_keyframe = true;
-    }
-
-    if(first_keyframe == true)
-    {
-        for(int i=0; i<max_frames; i++)
-        {
-            if(last_keyframe == false)
-            {
-                if(i > frame)
-                {
-                    if(frame_isset[i] == true)
-                    {
-                        last_x = frame_x[i];
-                        last_y = frame_y[i];
-                        last_rot = frame_rot[i];
-                        last_keyframe = true;
-                        last_id = i;
-                    }
-                }
-            }
-        }
-    }
-
-    cout << "frame: " << frame << " first keyframe: " << first_id << " last keyframe: " << last_id << endl;
-
-    int difference = last_id - first_id;
-
-    if(difference > 0)
-    {
-        ///calculate difference here
-        float xdiff = (last_x - first_x) / difference;
-        float ydiff = (last_y - first_y) / difference;
-        float rotdiff = (last_rot - first_rot) / difference;
-
-        int diffcount = 0;
-        if(frame >= first_id)
-        {
-            diffcount = difference - (last_id - frame);
+            ///set the last keyframe frames
+            frame_x[keyframe_ID[buff+1]] = keyframe_x[keyframe_ID[buff+1]];
+            frame_y[keyframe_ID[buff+1]] = keyframe_y[keyframe_ID[buff+1]];
+            frame_rot[keyframe_ID[buff+1]] = keyframe_rot[keyframe_ID[buff+1]];
         }
 
-        float new_x = frame_x[first_id] + (xdiff * diffcount);
-        float new_y = frame_y[first_id] + (ydiff * diffcount);
-
-        x = new_x;
-        y = new_y;
-
-        oldx = x;
-        oldy = y;
+        buff++;
     }
+}
+
+void Object::setFrame(int frame)
+{
+    keyframe_x[frame] = x;
+    keyframe_y[frame] = y;
+    keyframe_rot[frame] = 0;
+    keyframe_isset[frame] = true;
+
+    calculateAnimation();
+    keyframes_set++;
+}
+
+void Object::setPos(int frame)
+{
+    oldx = x;
+    oldy = y;
+
+    x = frame_x[frame];
+    y = frame_y[frame];
+    //rot = frame_rot[frame];
 }
 
 void Object::Draw(sf::RenderWindow& window)
