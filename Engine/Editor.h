@@ -33,7 +33,7 @@ class Editor
 
     float f_frames = 0;
     int frames = 0;
-    int max_frames = 60;
+    int max_frames = 240;
     bool play = false;
 
     Object obj_test;

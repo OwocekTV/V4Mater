@@ -16,8 +16,8 @@ class Object
     int max_frames = 60;
     int keyframes_set = 0; ///for stats
 
-    std::map<int,int> keyframe_x;
-    std::map<int,int> keyframe_y;
+    std::map<int,float> keyframe_x;
+    std::map<int,float> keyframe_y;
     std::map<int,float> keyframe_rot;
     std::map<int,bool> keyframe_isset;
 

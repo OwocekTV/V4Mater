@@ -242,7 +242,7 @@ void Editor::Draw(sf::RenderWindow& window)
 
             if(frames < 0)
             {
-                frames = max_frames;
+                frames = max_frames-1;
             }
 
             obj_test.setPos(frames);
@@ -252,7 +252,7 @@ void Editor::Draw(sf::RenderWindow& window)
         {
             frames += 1;
 
-            if(frames > max_frames)
+            if(frames+1 > max_frames)
             frames = 0;
 
             obj_test.setPos(frames);
@@ -385,7 +385,7 @@ void Editor::Draw(sf::RenderWindow& window)
         auto def = window.getDefaultView();
         window.setView(def);
 
-        t_curframes.setString("Frame "+to_string(int(frames)));
+        t_curframes.setString("Frame "+to_string(int(frames+1)));
         window.draw(t_curframes);
     }
 }

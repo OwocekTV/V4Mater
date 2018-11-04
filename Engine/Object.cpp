@@ -55,7 +55,7 @@ void Object::calculateAnimation()
         if(buff+1 < keyframe_ID.size())
         {
             ///get the frame difference
-            int framediff = keyframe_ID[buff+1] - keyframe_ID[buff];
+            float framediff = keyframe_ID[buff+1] - keyframe_ID[buff];
             float xdiff = (keyframe_x[keyframe_ID[buff+1]] - keyframe_x[keyframe_ID[buff]]) / framediff;
             float ydiff = (keyframe_y[keyframe_ID[buff+1]] - keyframe_y[keyframe_ID[buff]]) / framediff;
             float rotdiff = (keyframe_rot[keyframe_ID[buff+1]] - keyframe_rot[keyframe_ID[buff]]) / framediff;
@@ -77,6 +77,17 @@ void Object::calculateAnimation()
         }
 
         buff++;
+    }
+
+    ///change frames after last keyframe so the object will not
+    ///immediately teleport to the original position after last keyframe ends
+
+    int last_frame = keyframe_ID[keyframe_ID.size()-1];
+    for(int i=last_frame; i<max_frames; i++)
+    {
+        frame_x[i] = keyframe_x[last_frame];
+        frame_y[i] = keyframe_y[last_frame];
+        frame_rot[i] = keyframe_rot[last_frame];
     }
 }
 
