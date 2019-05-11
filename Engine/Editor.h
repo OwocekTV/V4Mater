@@ -24,19 +24,9 @@ class Editor
     bool isLeftClicked = false;
     int RMB_x = 0, RMB_y = 0;
     int LMB_x = 0, LMB_y = 0;
-    int distance_x = 0,distance_y = 0;
-    int Ldistance_x = 0,Ldistance_y = 0;
-    int camera_x = 320,camera_y = 180;
-    int oldcamera_x = camera_x,oldcamera_y = camera_y;
-
     sf::View view;
 
-    float f_frames = 0;
-    int frames = 0;
-    int max_frames = 240;
-    bool play = false;
-
-    Object obj_test;
+    std::vector<Object> objects;
 
     sf::RectangleShape r_outline;
 
