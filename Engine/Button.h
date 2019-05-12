@@ -15,6 +15,7 @@ class Button
     void Load(int type);
     void setPosition(int x, int y);
     bool isClicked(int mouseX, int mouseY, bool mouseLeftClick);
+    bool isHovered(int mouseX, int mouseY);
     void Draw(sf::RenderWindow& window);
 };
 

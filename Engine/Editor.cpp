@@ -218,11 +218,6 @@ void Editor::Draw(sf::RenderWindow& window)
             isResized = false;
         }
 
-        if(mouseLeftClick == false)
-        {
-            clickedOn = -1;
-        }
-
         for(int i=0; i<11; i++)
         {
             if(clickedOn == -1)
@@ -238,8 +233,27 @@ void Editor::Draw(sf::RenderWindow& window)
                 }
             }
 
+            if(clickedOn == i)
+            {
+                if(buttons[i].isHovered(mouseX,mouseY))
+                {
+                    if(mouseLeftClick == false)
+                    {
+                        cout << "Execute button " << i << endl;
+                        clickedOn = -1;
+                    }
+                }
+
+            }
+
             buttons[i].Draw(window);
 
+        }
+
+
+        if(mouseLeftClick == false)
+        {
+            clickedOn = -1;
         }
     }
 }

@@ -133,6 +133,19 @@ bool Button::isClicked(int mouseX, int mouseY, bool mouseLeftClick)
     return false;
 }
 
+bool Button::isHovered(int mouseX, int mouseY)
+{
+    if((mouseX >= button.getPosition().x) && (mouseX <= button.getPosition().x + 48))
+    {
+        if((mouseY >= button.getPosition().y) && (mouseY < button.getPosition().y + 48))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Button::Draw(sf::RenderWindow& window)
 {
     if(clickedOn)
