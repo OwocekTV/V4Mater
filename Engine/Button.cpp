@@ -5,17 +5,145 @@ Button::Button()
 
 }
 
-void isClicked()
+void Button::Load(int type)
 {
+    tex_button_idle.loadFromFile("resources/ui/button_idle.png");
+    tex_button_touch.loadFromFile("resources/ui/button_touch.png");
+    button.setTexture(tex_button_idle);
 
+    switch(type)
+    {
+        case 1:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_new.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 2:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_open.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 3:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_save.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 4:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_info.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 5:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_animation.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 6:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_select.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 7:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_rotate.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 8:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_add.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 9:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_remove.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 10:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_play.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 11:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_pause.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+
+        case 12:
+        {
+            tex_icon.loadFromFile("resources/ui/icon_record.png");
+            icon.setTexture(tex_icon);
+
+            break;
+        }
+    }
 }
 
-void Load(int type)
+void Button::setPosition(int x, int y)
 {
+    button.setPosition(x,y);
+    icon.setPosition(x,y);
+}
 
+bool Button::isClicked(int mouseX, int mouseY, bool mouseLeftClick)
+{
+    if((mouseX >= button.getPosition().x) && (mouseX <= button.getPosition().x + 48))
+    {
+        if((mouseY >= button.getPosition().y) && (mouseY < button.getPosition().y + 48))
+        {
+            if(mouseLeftClick == true)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void Button::Draw(sf::RenderWindow& window)
 {
+    if(clickedOn)
+    {
+        button.setTexture(tex_button_touch);
+    }
+    else
+    {
+        button.setTexture(tex_button_idle);
+    }
 
+    window.draw(button);
+    window.draw(icon);
 }

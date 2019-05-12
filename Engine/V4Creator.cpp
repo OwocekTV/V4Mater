@@ -16,6 +16,8 @@ void V4Creator::Init()
     window.setFramerateLimit(240);
     window.setKeyRepeatEnabled(false);
 
+    std::map<int,bool> mouseMap;
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -64,6 +66,13 @@ void V4Creator::Init()
                 {
                     mouseRightClick = false;
                 }
+            }
+
+            if(event.type == sf::Event::Resized)
+            {
+                sf::FloatRect visibleArea(0.f, 0.f, event.size.width, event.size.height);
+                window.setView(sf::View(visibleArea));
+                editor.isResized = true;
             }
         }
 

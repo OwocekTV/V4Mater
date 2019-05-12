@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "P4A.h"
 #include "Object.h"
+#include "Button.h"
 
 class Editor
 {
@@ -36,6 +37,10 @@ class Editor
     std::string archiveFile = "";
 
     P4A p4a;
+    Button buttons[11];
+    int clickedOn = -1;
+
+    bool isResized = true;
 
     Editor();
     std::string OpenArchiveFile();

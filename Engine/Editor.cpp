@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <iostream>
+#include "Button.h"
 
 using namespace std;
 
@@ -33,6 +34,18 @@ Editor::Editor()
     r_outline.setOutlineColor(sf::Color::Black);
 
     view.setSize(1280,720);
+
+    buttons[0].Load(1);
+    buttons[1].Load(2);
+    buttons[2].Load(3);
+    buttons[3].Load(4);
+    buttons[4].Load(5);
+    buttons[5].Load(6);
+    buttons[6].Load(7);
+    buttons[7].Load(8);
+    buttons[8].Load(9);
+    buttons[9].Load(10);
+    buttons[10].Load(12);
 }
 
 string Editor::OpenArchiveFile()
@@ -190,11 +203,43 @@ void Editor::Draw(sf::RenderWindow& window)
 
     if(state == 3)
     {
-        Button button_1;
-        Button button_2;
-        Button button_3;
-        Button button_4;
-        Button button_5;
-        Button button_6;
+        if(isResized == true)
+        {
+            for(int i=0; i<11; i++)
+            {
+                int add = 0;
+
+                if(i > 4)
+                add = 46;
+
+                buttons[i].setPosition(window.getSize().x - 48, 46*i+add);
+            }
+
+            isResized = false;
+        }
+
+        if(mouseLeftClick == false)
+        {
+            clickedOn = -1;
+        }
+
+        for(int i=0; i<11; i++)
+        {
+            if(clickedOn == -1)
+            {
+                if(buttons[i].isClicked(mouseX,mouseY,mouseLeftClick))
+                {
+                    buttons[i].clickedOn = true;
+                    clickedOn = i;
+                }
+                else
+                {
+                    buttons[i].clickedOn = false;
+                }
+            }
+
+            buttons[i].Draw(window);
+
+        }
     }
 }

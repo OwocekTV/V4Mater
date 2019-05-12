@@ -6,12 +6,15 @@
 class Button
 {
     public:
-    sf::Texture tex_button,tex_icon;
+    sf::Texture tex_button_idle,tex_button_touch,tex_icon;
     sf::Sprite button,icon;
+
+    bool clickedOn = false;
 
     Button();
     void Load(int type);
-    bool isClicked();
+    void setPosition(int x, int y);
+    bool isClicked(int mouseX, int mouseY, bool mouseLeftClick);
     void Draw(sf::RenderWindow& window);
 };
 
