@@ -39,6 +39,7 @@ class Editor
     P4A p4a;
     Button buttons[11];
     int clickedOn = -1;
+    bool playing = false;
 
     bool isResized = true;
 

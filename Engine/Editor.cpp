@@ -240,6 +240,25 @@ void Editor::Draw(sf::RenderWindow& window)
                     if(mouseLeftClick == false)
                     {
                         cout << "Execute button " << i << endl;
+                        switch(i)
+                        {
+                            case 9: ///Play/Stop button
+                            {
+                                if(playing)
+                                {
+                                    playing = false;
+                                    buttons[i].Load(10);
+                                }
+                                else
+                                {
+                                    playing = true;
+                                    buttons[i].Load(11);
+                                }
+
+                                break;
+                            }
+                        }
+
                         clickedOn = -1;
                     }
                 }
