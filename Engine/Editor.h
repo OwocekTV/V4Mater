@@ -5,6 +5,7 @@
 #include "P4A.h"
 #include "Object.h"
 #include "Button.h"
+#include "Timeline.h"
 
 class Editor
 {
@@ -42,6 +43,9 @@ class Editor
     bool playing = false;
 
     bool isResized = true;
+
+    Timeline timeline;
+    float max_time = 30;
 
     Editor();
     std::string OpenArchiveFile();

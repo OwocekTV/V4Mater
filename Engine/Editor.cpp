@@ -205,6 +205,8 @@ void Editor::Draw(sf::RenderWindow& window)
     {
         if(isResized == true)
         {
+            timeline.Create(max_time,window);
+
             for(int i=0; i<11; i++)
             {
                 int add = 0;
@@ -247,11 +249,21 @@ void Editor::Draw(sf::RenderWindow& window)
                                 if(playing)
                                 {
                                     playing = false;
+                                    buttons[5].setEnabled(true);
+                                    buttons[6].setEnabled(true);
+                                    buttons[7].setEnabled(true);
+                                    buttons[8].setEnabled(true);
+                                    buttons[10].setEnabled(true);
                                     buttons[i].Load(10);
                                 }
                                 else
                                 {
                                     playing = true;
+                                    buttons[5].setEnabled(false);
+                                    buttons[6].setEnabled(false);
+                                    buttons[7].setEnabled(false);
+                                    buttons[8].setEnabled(false);
+                                    buttons[10].setEnabled(false);
                                     buttons[i].Load(11);
                                 }
 
@@ -269,10 +281,11 @@ void Editor::Draw(sf::RenderWindow& window)
 
         }
 
-
         if(mouseLeftClick == false)
         {
             clickedOn = -1;
         }
+
+        timeline.Draw(window);
     }
 }

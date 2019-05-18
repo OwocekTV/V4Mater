@@ -119,6 +119,11 @@ void Button::setPosition(int x, int y)
 
 bool Button::isClicked(int mouseX, int mouseY, bool mouseLeftClick)
 {
+    if(disabled)
+    {
+        return false;
+    }
+
     if((mouseX >= button.getPosition().x) && (mouseX <= button.getPosition().x + 48))
     {
         if((mouseY >= button.getPosition().y) && (mouseY < button.getPosition().y + 48))
@@ -146,6 +151,14 @@ bool Button::isHovered(int mouseX, int mouseY)
     return false;
 }
 
+bool Button::setEnabled(bool enable)
+{
+    if(enable)
+    disabled = false;
+    else
+    disabled = true;
+}
+
 void Button::Draw(sf::RenderWindow& window)
 {
     if(clickedOn)
@@ -155,6 +168,17 @@ void Button::Draw(sf::RenderWindow& window)
     else
     {
         button.setTexture(tex_button_idle);
+    }
+
+    if(disabled)
+    {
+        button.setColor(sf::Color(220,220,220,255));
+        icon.setColor(sf::Color(220,220,220,255));
+    }
+    else
+    {
+        button.setColor(sf::Color(255,255,255,255));
+        icon.setColor(sf::Color(255,255,255,255));
     }
 
     window.draw(button);
