@@ -45,7 +45,24 @@ class Editor
     bool isResized = true;
 
     Timeline timeline;
-    float max_time = 30;
+    float cur_pos = 0;
+    float max_time = 10;
+
+    int object_selected = -1;
+    bool object_clicked = false;
+
+    int highestLayer = -1;
+    int highestIndex = -1;
+    bool object_offset = false;
+    int mX=0,mY=0;
+
+    bool allowMove = false;
+    bool allowRotate = false;
+
+    string directory = "";
+
+    bool buttons_loaded = false;
+    sf::RectangleShape r_selected;
 
     Editor();
     std::string OpenArchiveFile();

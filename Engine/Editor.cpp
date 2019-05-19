@@ -8,44 +8,7 @@ using namespace std;
 
 Editor::Editor()
 {
-    font.loadFromFile("resources/Lato-Regular.ttf");
-
-    t_logo.setFont(font);
-    t_logo.setString("Patafour Creator");
-    t_logo.setCharacterSize(60);
-    t_logo.setFillColor(sf::Color::Black);
-
-    t_newfile.setFont(font);
-    t_newfile.setString("New file");
-    t_newfile.setCharacterSize(40);
-    t_newfile.setFillColor(sf::Color::Black);
-
-    t_loadfile.setFont(font);
-    t_loadfile.setString("Load file");
-    t_loadfile.setCharacterSize(40);
-    t_loadfile.setFillColor(sf::Color::Black);
-
-    t_curframes.setFont(font);
-    t_curframes.setCharacterSize(40);
-    t_curframes.setFillColor(sf::Color::Black);
-
-    r_outline.setOutlineThickness(2);
-    r_outline.setFillColor(sf::Color(0,0,0,0));
-    r_outline.setOutlineColor(sf::Color::Black);
-
     view.setSize(1280,720);
-
-    buttons[0].Load(1);
-    buttons[1].Load(2);
-    buttons[2].Load(3);
-    buttons[3].Load(4);
-    buttons[4].Load(5);
-    buttons[5].Load(6);
-    buttons[6].Load(7);
-    buttons[7].Load(8);
-    buttons[8].Load(9);
-    buttons[9].Load(10);
-    buttons[10].Load(12);
 }
 
 string Editor::OpenArchiveFile()
@@ -113,6 +76,23 @@ string Editor::OpenFile()
 
 void Editor::Draw(sf::RenderWindow& window)
 {
+    if(buttons_loaded == false)
+    {
+        buttons[0].Load(1, directory);
+        buttons[1].Load(2, directory);
+        buttons[2].Load(3, directory);
+        buttons[3].Load(4, directory);
+        buttons[4].Load(5, directory);
+        buttons[5].Load(6, directory);
+        buttons[6].Load(7, directory);
+        buttons[7].Load(8, directory);
+        buttons[8].Load(9, directory);
+        buttons[9].Load(10, directory);
+        buttons[10].Load(12, directory);
+
+        buttons_loaded = true;
+    }
+
     if(state == 0)
     {
         t_logo.setOrigin(t_logo.getGlobalBounds().width/2,t_logo.getGlobalBounds().height/2);
@@ -203,6 +183,89 @@ void Editor::Draw(sf::RenderWindow& window)
 
     if(state == 3)
     {
+        vector<int> objects_clicked;
+
+        for(int i=0; i<objects.size(); i++)
+        {
+            if(mouseX > objects[i].x - objects[i].or_x)
+            {
+                if(mouseX < objects[i].x + objects[i].or_x)
+                {
+                    if(mouseY > objects[i].y - objects[i].or_y)
+                    {
+                        if(mouseY < objects[i].y + objects[i].or_y)
+                        {
+                            if(mouseLeftClick == true)
+                            {
+                                objects_clicked.push_back(i);
+                            }
+                        }
+                    }
+                }
+            }
+
+            objects[i].Draw(window);
+        }
+
+        if(objects.size() > 0)
+        {
+            r_selected.setSize(sf::Vector2f(objects[object_selected].s_obj.getGlobalBounds().width,objects[object_selected].s_obj.getGlobalBounds().height));
+            r_selected.setOrigin(objects[object_selected].or_x,objects[object_selected].or_y);
+            r_selected.setPosition(objects[object_selected].x,objects[object_selected].y);
+            r_selected.setFillColor(sf::Color(0,0,0,0));
+            r_selected.setOutlineColor(sf::Color::Black);
+            r_selected.setOutlineThickness(2);
+
+            window.draw(r_selected);
+
+            if((mouseLeftClick == true) && (object_clicked == false))
+            {
+                for(int i=0; i<objects_clicked.size(); i++)
+                {
+                    if(highestLayer < objects[objects_clicked[i]].layer)
+                    {
+                        highestLayer = objects[objects_clicked[i]].layer;
+                        highestIndex = objects_clicked[i];
+                    }
+                }
+
+                cout << "Highest layer: " << highestLayer << " highest index: " << highestIndex << endl;
+
+                object_selected = highestIndex;
+                object_clicked = true;
+            }
+
+            if(allowMove == true)
+            {
+                if((highestLayer >= 0) && (highestIndex >= 0))
+                {
+                    if(object_clicked == true)
+                    {
+                        if(object_offset == false)
+                        {
+                            mX = objects[object_selected].x - mouseX;
+                            mY = objects[object_selected].y - mouseY;
+
+                            object_offset = true;
+                        }
+
+                        //cout << "mX: " << mX << " mY: " << mY << endl;
+
+                        objects[object_selected].x = mouseX + mX;
+                        objects[object_selected].y = mouseY + mY;
+                    }
+                }
+            }
+
+            if(mouseLeftClick == false)
+            {
+                object_clicked = false;
+                object_offset = false;
+                highestIndex = -1;
+                highestLayer = -1;
+            }
+        }
+
         if(isResized == true)
         {
             timeline.Create(max_time,window);
@@ -222,6 +285,8 @@ void Editor::Draw(sf::RenderWindow& window)
 
         for(int i=0; i<11; i++)
         {
+            //cout << i << " " << buttons[i].selected << " " << buttons[i].disabled << endl;
+
             if(clickedOn == -1)
             {
                 if(buttons[i].isClicked(mouseX,mouseY,mouseLeftClick))
@@ -244,27 +309,90 @@ void Editor::Draw(sf::RenderWindow& window)
                         cout << "Execute button " << i << endl;
                         switch(i)
                         {
+                            case 5: ///Selection Tool
+                            {
+                                if(buttons[i].selected)
+                                {
+                                    buttons[i].setSelected(false);
+                                    allowMove = false;
+                                }
+                                else
+                                {
+                                    buttons[i].setSelected(true);
+                                    allowMove = true;
+                                }
+
+                                buttons[6].setSelected(false);
+
+                                allowRotate = false;
+
+                                break;
+                            }
+
+                            case 6: ///Rotation Tool
+                            {
+                                if(buttons[i].selected)
+                                {
+                                    buttons[i].setSelected(false);
+                                    allowRotate = false;
+                                }
+                                else
+                                {
+                                    buttons[i].setSelected(true);
+                                    allowRotate = true;
+                                }
+
+                                buttons[5].setSelected(false);
+
+                                allowMove = false;
+
+                                break;
+                            }
+
+                            case 7: ///Add object button
+                            {
+                                string tex_file = OpenFile();
+                                Object tmp;
+                                tmp.Load(tex_file, window.getSize().x/2,window.getSize().y/2);
+                                tmp.layer = objects.size();
+                                objects.push_back(tmp);
+                                break;
+                            }
+
                             case 9: ///Play/Stop button
                             {
                                 if(playing)
                                 {
                                     playing = false;
+
                                     buttons[5].setEnabled(true);
                                     buttons[6].setEnabled(true);
                                     buttons[7].setEnabled(true);
                                     buttons[8].setEnabled(true);
                                     buttons[10].setEnabled(true);
-                                    buttons[i].Load(10);
+
+                                    buttons[i].Load(10, directory);
                                 }
                                 else
                                 {
                                     playing = true;
+
                                     buttons[5].setEnabled(false);
                                     buttons[6].setEnabled(false);
                                     buttons[7].setEnabled(false);
                                     buttons[8].setEnabled(false);
                                     buttons[10].setEnabled(false);
-                                    buttons[i].Load(11);
+
+                                    buttons[5].setSelected(false);
+                                    buttons[6].setSelected(false);
+                                    buttons[7].setSelected(false);
+                                    buttons[8].setSelected(false);
+                                    buttons[10].setSelected(false);
+
+                                    allowMove = false;
+                                    allowRotate = false;
+
+                                    buttons[i].Load(11, directory);
                                 }
 
                                 break;
@@ -286,6 +414,41 @@ void Editor::Draw(sf::RenderWindow& window)
             clickedOn = -1;
         }
 
+        if(playing)
+        {
+            timeline.cur_pos += 1 / float(fps);
+
+            if(timeline.cur_pos > max_time)
+            {
+                timeline.cur_pos = 0;
+            }
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            max_time -= 0.01;
+
+            if(max_time <= 0)
+            max_time = 0.01;
+
+            if(timeline.cur_pos >= max_time)
+            timeline.cur_pos = max_time;
+
+            timeline.Create(max_time,window);
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            max_time += 0.01;
+
+            timeline.Create(max_time,window);
+        }
+
+        //timeline.cur_pos = cur_pos;
+        timeline.max_time = max_time;
+        timeline.mouseX = mouseX;
+        timeline.mouseY = mouseY;
+        timeline.mouseLeftClick = mouseLeftClick;
         timeline.Draw(window);
     }
 }

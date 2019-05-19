@@ -7,7 +7,7 @@
 
 class V4Creator
 {
-    private:
+    public:
     Editor editor;
 
     std::vector<float> tot_fps;
@@ -16,7 +16,6 @@ class V4Creator
     float fps = 60;
     sf::Clock fpsclock;
 
-    public:
     int mouseX,mouseY;
     bool mouseLeftClick = false;
     bool mouseRightClick = false;
