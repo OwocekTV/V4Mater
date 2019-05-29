@@ -183,40 +183,49 @@ void Editor::Draw(sf::RenderWindow& window)
 
     if(state == 3)
     {
-        vector<int> objects_clicked;
+        /// /////////////////////////// ///
+        /// ///////// Objects ///////// ///
+        /// /////////////////////////// ///
 
-        for(int i=0; i<objects.size(); i++)
+        if(objects.size() > 0)
         {
-            if(mouseX > objects[i].x - objects[i].or_x)
+            vector<int> objects_clicked;
+
+            for(int i=0; i<objects.size(); i++)
             {
-                if(mouseX < objects[i].x + objects[i].or_x)
+                if(mouseX > objects[i].x - objects[i].or_x)
                 {
-                    if(mouseY > objects[i].y - objects[i].or_y)
+                    if(mouseX < objects[i].x + objects[i].or_x)
                     {
-                        if(mouseY < objects[i].y + objects[i].or_y)
+                        if(mouseY > objects[i].y - objects[i].or_y)
                         {
-                            if(mouseLeftClick == true)
+                            if(mouseY < objects[i].y + objects[i].or_y)
                             {
-                                objects_clicked.push_back(i);
+                                if(mouseLeftClick == true)
+                                {
+                                    objects_clicked.push_back(i);
+                                }
                             }
                         }
                     }
                 }
+
+                objects[i].Draw(window);
             }
 
-            objects[i].Draw(window);
-        }
+            cout << "object_s: " << object_selected << endl;
 
-        if(objects.size() > 0)
-        {
-            r_selected.setSize(sf::Vector2f(objects[object_selected].s_obj.getGlobalBounds().width,objects[object_selected].s_obj.getGlobalBounds().height));
-            r_selected.setOrigin(objects[object_selected].or_x,objects[object_selected].or_y);
-            r_selected.setPosition(objects[object_selected].x,objects[object_selected].y);
-            r_selected.setFillColor(sf::Color(0,0,0,0));
-            r_selected.setOutlineColor(sf::Color::Black);
-            r_selected.setOutlineThickness(2);
+            if(object_selected >= 0)
+            {
+                r_selected.setSize(sf::Vector2f(objects[object_selected].s_obj.getGlobalBounds().width,objects[object_selected].s_obj.getGlobalBounds().height));
+                r_selected.setOrigin(objects[object_selected].or_x,objects[object_selected].or_y);
+                r_selected.setPosition(objects[object_selected].x,objects[object_selected].y);
+                r_selected.setFillColor(sf::Color(0,0,0,0));
+                r_selected.setOutlineColor(sf::Color::Black);
+                r_selected.setOutlineThickness(2);
 
-            window.draw(r_selected);
+                window.draw(r_selected);
+            }
 
             if((mouseLeftClick == true) && (object_clicked == false))
             {
@@ -241,18 +250,21 @@ void Editor::Draw(sf::RenderWindow& window)
                 {
                     if(object_clicked == true)
                     {
-                        if(object_offset == false)
+                        if(object_selected >= 0)
                         {
-                            mX = objects[object_selected].x - mouseX;
-                            mY = objects[object_selected].y - mouseY;
+                            if(object_offset == false)
+                            {
+                                mX = objects[object_selected].x - mouseX;
+                                mY = objects[object_selected].y - mouseY;
 
-                            object_offset = true;
+                                object_offset = true;
+                            }
+
+                            //cout << "mX: " << mX << " mY: " << mY << endl;
+
+                            objects[object_selected].x = mouseX + mX;
+                            objects[object_selected].y = mouseY + mY;
                         }
-
-                        //cout << "mX: " << mX << " mY: " << mY << endl;
-
-                        objects[object_selected].x = mouseX + mX;
-                        objects[object_selected].y = mouseY + mY;
                     }
                 }
             }
@@ -265,6 +277,10 @@ void Editor::Draw(sf::RenderWindow& window)
                 highestLayer = -1;
             }
         }
+
+        /// /////////////////////////// ///
+        /// ///////// Resize ////////// ///
+        /// /////////////////////////// ///
 
         if(isResized == true)
         {
@@ -283,10 +299,12 @@ void Editor::Draw(sf::RenderWindow& window)
             isResized = false;
         }
 
+        /// /////////////////////////// ///
+        /// ///////// Buttons ///////// ///
+        /// /////////////////////////// ///
+
         for(int i=0; i<11; i++)
         {
-            //cout << i << " " << buttons[i].selected << " " << buttons[i].disabled << endl;
-
             if(clickedOn == -1)
             {
                 if(buttons[i].isClicked(mouseX,mouseY,mouseLeftClick))
@@ -356,6 +374,9 @@ void Editor::Draw(sf::RenderWindow& window)
                                 tmp.Load(tex_file, window.getSize().x/2,window.getSize().y/2);
                                 tmp.layer = objects.size();
                                 objects.push_back(tmp);
+
+                                cout << "Added new object from " << tex_file << endl;
+
                                 break;
                             }
 
@@ -397,6 +418,12 @@ void Editor::Draw(sf::RenderWindow& window)
 
                                 break;
                             }
+
+                            case 10:
+                            {
+                                //cout << "Record frame at " << cur_pos << " object " << object_selected << endl;
+                                break;
+                            }
                         }
 
                         clickedOn = -1;
@@ -408,6 +435,10 @@ void Editor::Draw(sf::RenderWindow& window)
             buttons[i].Draw(window);
 
         }
+
+        /// /////////////////////////// ///
+        /// ///////// Actions ///////// ///
+        /// /////////////////////////// ///
 
         if(mouseLeftClick == false)
         {
@@ -444,7 +475,6 @@ void Editor::Draw(sf::RenderWindow& window)
             timeline.Create(max_time,window);
         }
 
-        //timeline.cur_pos = cur_pos;
         timeline.max_time = max_time;
         timeline.mouseX = mouseX;
         timeline.mouseY = mouseY;
