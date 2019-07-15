@@ -47,6 +47,7 @@ class Editor
     Timeline timeline;
     float cur_pos = 0;
     float max_time = 10;
+    float timeline_old = 0;
 
     int object_selected = -1;
     bool object_clicked = false;

@@ -210,10 +210,18 @@ void Editor::Draw(sf::RenderWindow& window)
                     }
                 }
 
+                ///Calculate object's position based on the timeline
+                if(timeline_old != timeline.cur_pos)
+                {
+                    objects[i].SetPos(timeline.cur_pos);
+                }
+
                 objects[i].Draw(window);
             }
 
-            cout << "object_s: " << object_selected << endl;
+            timeline_old = timeline.cur_pos;
+
+            //cout << "object_s: " << object_selected << endl;
 
             if(object_selected >= 0)
             {
@@ -229,19 +237,22 @@ void Editor::Draw(sf::RenderWindow& window)
 
             if((mouseLeftClick == true) && (object_clicked == false))
             {
-                for(int i=0; i<objects_clicked.size(); i++)
+                if(mouseX < window.getSize().x - 48)
                 {
-                    if(highestLayer < objects[objects_clicked[i]].layer)
+                    for(int i=0; i<objects_clicked.size(); i++)
                     {
-                        highestLayer = objects[objects_clicked[i]].layer;
-                        highestIndex = objects_clicked[i];
+                        if(highestLayer < objects[objects_clicked[i]].layer)
+                        {
+                            highestLayer = objects[objects_clicked[i]].layer;
+                            highestIndex = objects_clicked[i];
+                        }
                     }
+
+                    cout << "Highest layer: " << highestLayer << " highest index: " << highestIndex << endl;
+
+                    object_selected = highestIndex;
+                    object_clicked = true;
                 }
-
-                cout << "Highest layer: " << highestLayer << " highest index: " << highestIndex << endl;
-
-                object_selected = highestIndex;
-                object_clicked = true;
             }
 
             if(allowMove == true)
@@ -264,12 +275,14 @@ void Editor::Draw(sf::RenderWindow& window)
 
                             objects[object_selected].x = mouseX + mX;
                             objects[object_selected].y = mouseY + mY;
+
+                            cout << "X: " << objects[object_selected].x-640 << " Y: " << objects[object_selected].y-360 << endl;
                         }
                     }
                 }
             }
 
-            if(mouseLeftClick == false)
+            if((mouseX < window.getSize().x-48) && (mouseLeftClick == false))
             {
                 object_clicked = false;
                 object_offset = false;
@@ -421,7 +434,8 @@ void Editor::Draw(sf::RenderWindow& window)
 
                             case 10:
                             {
-                                //cout << "Record frame at " << cur_pos << " object " << object_selected << endl;
+                                cout << "Record frame at " << timeline.cur_pos << " object " << object_selected << endl;
+                                objects[object_selected].SetFrame(timeline.cur_pos);
                                 break;
                             }
                         }

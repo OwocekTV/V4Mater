@@ -13,15 +13,27 @@ class Object
 
     float x,y,r; ///local position
     float or_x,or_y; ///origin (for rotation)
+    float s_x,s_y; ///scale
     int layer = 0;
 
-    vector<float> keyframes; ///positions on where the frame was recorded
-    vector<float> key_x; ///X position for recorded frame
-    vector<float> key_y; ///Y position for recorded frame
-    vector<float> key_r; ///rotation for recorded frame
+    struct Frame
+    {
+        float time; ///timestamp
+        float pos_x; ///x position
+        float pos_y; ///y position
+        float or_x; ///x origin
+        float or_y; ///y origin
+        float rotation; ///rotation
+        float scale_x; ///x scale
+        float scale_y; ///y scale
+    };
+
+    vector<Frame> frames; ///frames
 
     Object();
     void Load(string filename, int xpos, int ypos);
+    void SetFrame(float time);
+    void SetPos(float time);
     void Draw(sf::RenderWindow& window);
 };
 
