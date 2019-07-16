@@ -227,7 +227,7 @@ void Editor::Draw(sf::RenderWindow& window)
             if(object_selected >= 0)
             {
                 r_selected.setSize(sf::Vector2f(objects[object_selected].s_obj.getGlobalBounds().width,objects[object_selected].s_obj.getGlobalBounds().height));
-                r_selected.setOrigin(objects[object_selected].or_x,objects[object_selected].or_y);
+                r_selected.setOrigin(sf::Vector2f(objects[object_selected].s_obj.getGlobalBounds().width/2,objects[object_selected].s_obj.getGlobalBounds().height/2));
                 r_selected.setPosition(objects[object_selected].x,objects[object_selected].y);
                 r_selected.setFillColor(sf::Color(0,0,0,0));
                 r_selected.setOutlineColor(sf::Color::Black);
@@ -285,47 +285,45 @@ void Editor::Draw(sf::RenderWindow& window)
                         {
                             if(!object_offset)
                             {
-                                ///Need to calculate rotation based on mouse position
-                                float diff_x = objects[object_selected].x - mouseX;
-                                float diff_y = objects[object_selected].y - mouseY;
-
-                                float PI = 3.14159265;
-                                mR = atan2(diff_y,diff_x) * 180 / PI;
-                                mR -= 180;
-                                mR += oldrot;
+                                mX = mouseX;
+                                mY = mouseY;
 
                                 object_offset = true;
                             }
 
                             ///Need to calculate rotation based on mouse position
-                            float diff_x = objects[object_selected].x - mouseX;
-                            float diff_y = objects[object_selected].y - mouseY;
+                            float diff_x = mX - mouseX;
+                            float diff_y = mY - mouseY;
 
-                            float PI = 3.14159265;
-                            float n_rot = atan2(diff_y,diff_x) * 180 / PI;
-                            float diff_rot = abs(oldrot) - abs(n_rot - 180);
-
-                            cout << "Rotations: " << objects[object_selected].rs << endl;
-                            cout << "mR: " << mR << endl;
-
-                            ///If a difference is too high (359 -> 0 or 0 -> 359) then detect it as an additional rotation ?????
-                            ///Rotation anti-clockwise: diff is positive
-                            ///Rotation clockwise: diff is negative
-
-                            ///Unreliable solution for now!!!
-                            if(diff_rot > 350)
+                            if((abs(diff_x) >= 8) || (abs(diff_y) >= 8))
                             {
-                                objects[object_selected].rs -= 1;
+                                float PI = 3.14159265;
+                                float n_rot = atan2(diff_y,diff_x) * 180 / PI;
+                                float diff_rot = abs(oldrot) - abs(n_rot - 180);
+
+                                cout << "dx: " << diff_x << " dy: " << diff_y << endl;
+
+                                ///If a difference is too high (359 -> 0 or 0 -> 359) then detect it as an additional rotation ?????
+                                ///Rotation anti-clockwise: diff is positive
+                                ///Rotation clockwise: diff is negative
+
+                                ///Unreliable solution for now!!!
+                                if(diff_rot > 350)
+                                {
+                                    objects[object_selected].rs -= 1;
+                                    cout << "Added -1 rotation" << endl;
+                                }
+
+                                if(diff_rot < -350)
+                                {
+                                    objects[object_selected].rs += 1;
+                                    cout << "Added +1 rotation" << endl;
+                                }
+
+                                objects[object_selected].r = n_rot-180-mR;
+
+                                oldrot = objects[object_selected].r;
                             }
-
-                            if(diff_rot < -350)
-                            {
-                                objects[object_selected].rs += 1;
-                            }
-
-                            objects[object_selected].r = n_rot-180-mR;
-
-                            oldrot = objects[object_selected].r;
                         }
                     }
                 }
