@@ -55,10 +55,13 @@ class Editor
     int highestLayer = -1;
     int highestIndex = -1;
     bool object_offset = false;
-    int mX=0,mY=0;
+    int mX=0,mY=0,mR=0;
 
     bool allowMove = false;
     bool allowRotate = false;
+
+    ///TEMPORARY
+    float oldrot = 0;
 
     string directory = "";
 

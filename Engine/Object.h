@@ -11,7 +11,7 @@ class Object
     sf::Texture tex_obj;
     sf::Sprite s_obj;
 
-    float x,y,r; ///local position
+    float x,y,r,rs=0; ///local position
     float or_x,or_y; ///origin (for rotation)
     float s_x,s_y; ///scale
     int layer = 0;

@@ -34,7 +34,7 @@ void Object::SetFrame(float time)
     tmp.pos_y = y;
     tmp.or_x = or_x;
     tmp.or_y = or_y;
-    tmp.rotation = r;
+    tmp.rotation = r + (rs*360);
     tmp.scale_x = s_x;
     tmp.scale_y = s_y;
 
@@ -55,28 +55,23 @@ void Object::SetPos(float time)
 
                 if(frames[i+1].time > time)
                 {
-                    ///Found inbetween frames
-                    cout << "Time " << time << " found between " << i << " and " << i+1 << endl;
-
                     ///Calculate in-between positions
                     float time_diff = frames[i+1].time - frames[i].time;
                     float time_pos = time - frames[i].time;
                     float time_percentage = time_pos / time_diff;
 
-                    cout << "Time_diff: " << time_diff << " time_pos: " << time_pos << " time_percent: " << time_percentage << "%" << endl;
-
-                    float n_xpos = frames[i].pos_x + ((frames[i+1].pos_x - frames[i].pos_x) * time_percentage);
-                    float n_ypos = frames[i].pos_y + ((frames[i+1].pos_y - frames[i].pos_y) * time_percentage);
-
-                    x = n_xpos;
-                    y = n_ypos;
+                    x = frames[i].pos_x + ((frames[i+1].pos_x - frames[i].pos_x) * time_percentage);
+                    y = frames[i].pos_y + ((frames[i+1].pos_y - frames[i].pos_y) * time_percentage);
+                    r = frames[i].rotation + ((frames[i+1].rotation - frames[i].rotation) * time_percentage);
+                    or_x = frames[i].or_x + ((frames[i+1].or_x - frames[i].or_x) * time_percentage);
+                    or_y = frames[i].or_y + ((frames[i+1].or_y - frames[i].or_y) * time_percentage);
+                    s_x = frames[i].scale_x + ((frames[i+1].scale_x - frames[i].scale_x) * time_percentage);
+                    s_y = frames[i].scale_y + ((frames[i+1].scale_y - frames[i].scale_y) * time_percentage);
                 }
             }
             else
             {
                 ///thats the last frame
-                cout << "Time " << time << " is after the last frame " << i << endl;
-
                 x = frames[i].pos_x;
                 y = frames[i].pos_y;
                 r = frames[i].rotation;
@@ -94,5 +89,6 @@ void Object::Draw(sf::RenderWindow& window)
     s_obj.setTexture(tex_obj);
     s_obj.setOrigin(or_x,or_y);
     s_obj.setPosition(x,y);
+    s_obj.setRotation(r);
     window.draw(s_obj);
 }

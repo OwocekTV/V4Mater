@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <iostream>
+#include <cmath>
 #include "Button.h"
 
 using namespace std;
@@ -255,15 +256,16 @@ void Editor::Draw(sf::RenderWindow& window)
                 }
             }
 
-            if(allowMove == true)
+
+            if((highestLayer >= 0) && (highestIndex >= 0))
             {
-                if((highestLayer >= 0) && (highestIndex >= 0))
+                if(object_clicked)
                 {
-                    if(object_clicked == true)
+                    if(object_selected >= 0)
                     {
-                        if(object_selected >= 0)
+                        if(allowMove)
                         {
-                            if(object_offset == false)
+                            if(!object_offset)
                             {
                                 mX = objects[object_selected].x - mouseX;
                                 mY = objects[object_selected].y - mouseY;
@@ -276,7 +278,54 @@ void Editor::Draw(sf::RenderWindow& window)
                             objects[object_selected].x = mouseX + mX;
                             objects[object_selected].y = mouseY + mY;
 
-                            cout << "X: " << objects[object_selected].x-640 << " Y: " << objects[object_selected].y-360 << endl;
+                            //cout << "X: " << objects[object_selected].x-640 << " Y: " << objects[object_selected].y-360 << endl;
+                        }
+
+                        if(allowRotate)
+                        {
+                            if(!object_offset)
+                            {
+                                ///Need to calculate rotation based on mouse position
+                                float diff_x = objects[object_selected].x - mouseX;
+                                float diff_y = objects[object_selected].y - mouseY;
+
+                                float PI = 3.14159265;
+                                mR = atan2(diff_y,diff_x) * 180 / PI;
+                                mR -= 180;
+                                mR += oldrot;
+
+                                object_offset = true;
+                            }
+
+                            ///Need to calculate rotation based on mouse position
+                            float diff_x = objects[object_selected].x - mouseX;
+                            float diff_y = objects[object_selected].y - mouseY;
+
+                            float PI = 3.14159265;
+                            float n_rot = atan2(diff_y,diff_x) * 180 / PI;
+                            float diff_rot = abs(oldrot) - abs(n_rot - 180);
+
+                            cout << "Rotations: " << objects[object_selected].rs << endl;
+                            cout << "mR: " << mR << endl;
+
+                            ///If a difference is too high (359 -> 0 or 0 -> 359) then detect it as an additional rotation ?????
+                            ///Rotation anti-clockwise: diff is positive
+                            ///Rotation clockwise: diff is negative
+
+                            ///Unreliable solution for now!!!
+                            if(diff_rot > 350)
+                            {
+                                objects[object_selected].rs -= 1;
+                            }
+
+                            if(diff_rot < -350)
+                            {
+                                objects[object_selected].rs += 1;
+                            }
+
+                            objects[object_selected].r = n_rot-180-mR;
+
+                            oldrot = objects[object_selected].r;
                         }
                     }
                 }
