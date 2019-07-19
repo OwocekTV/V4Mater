@@ -93,6 +93,6 @@ void V4Creator::Init()
 
         window.display();
 
-        keyMap.clear();
+        //keyMap.clear();
     }
 }

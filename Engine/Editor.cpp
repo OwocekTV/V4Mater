@@ -285,45 +285,20 @@ void Editor::Draw(sf::RenderWindow& window)
                         {
                             if(!object_offset)
                             {
-                                mX = mouseX;
-                                mY = mouseY;
-
                                 object_offset = true;
                             }
 
-                            ///Need to calculate rotation based on mouse position
-                            float diff_x = mX - mouseX;
-                            float diff_y = mY - mouseY;
-
-                            if((abs(diff_x) >= 8) || (abs(diff_y) >= 8))
+                            if(keyMap[sf::Keyboard::Up])
                             {
-                                float PI = 3.14159265;
-                                float n_rot = atan2(diff_y,diff_x) * 180 / PI;
-                                float diff_rot = abs(oldrot) - abs(n_rot - 180);
-
-                                cout << "dx: " << diff_x << " dy: " << diff_y << endl;
-
-                                ///If a difference is too high (359 -> 0 or 0 -> 359) then detect it as an additional rotation ?????
-                                ///Rotation anti-clockwise: diff is positive
-                                ///Rotation clockwise: diff is negative
-
-                                ///Unreliable solution for now!!!
-                                if(diff_rot > 350)
-                                {
-                                    objects[object_selected].rs -= 1;
-                                    cout << "Added -1 rotation" << endl;
-                                }
-
-                                if(diff_rot < -350)
-                                {
-                                    objects[object_selected].rs += 1;
-                                    cout << "Added +1 rotation" << endl;
-                                }
-
-                                objects[object_selected].r = n_rot-180-mR;
-
-                                oldrot = objects[object_selected].r;
+                                objects[object_selected].r -= float(60) / fps;
                             }
+
+                            if(keyMap[sf::Keyboard::Down])
+                            {
+                                objects[object_selected].r += float(60) / fps;
+                            }
+
+                            cout << objects[object_selected].r << endl;
                         }
                     }
                 }
@@ -333,6 +308,7 @@ void Editor::Draw(sf::RenderWindow& window)
             {
                 object_clicked = false;
                 object_offset = false;
+                start_point = 999;
                 highestIndex = -1;
                 highestLayer = -1;
             }

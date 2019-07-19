@@ -51,6 +51,8 @@ class Editor
 
     int object_selected = -1;
     bool object_clicked = false;
+    float start_point = 999;
+    float latest_point = 0;
 
     int highestLayer = -1;
     int highestIndex = -1;
