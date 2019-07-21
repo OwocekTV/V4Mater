@@ -8,6 +8,8 @@ using namespace std;
 class Object
 {
     public:
+    std::string texture_path;
+
     sf::Texture tex_obj;
     sf::Sprite s_obj;
 

@@ -93,6 +93,7 @@ void V4Creator::Init()
 
         window.display();
 
+        keyMap[sf::Keyboard::S] = false;
         //keyMap.clear();
     }
 }

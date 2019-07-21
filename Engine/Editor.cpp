@@ -3,9 +3,19 @@
 #include <windows.h>
 #include <iostream>
 #include <cmath>
+#include <sstream>
 #include "Button.h"
 
 using namespace std;
+
+template <typename T>
+std::string to_string_with_precision2(const T a_value, const int n = 2)
+{
+    std::ostringstream out;
+    out.precision(n);
+    out << std::fixed << a_value;
+    return out.str();
+}
 
 Editor::Editor()
 {
@@ -73,6 +83,37 @@ string Editor::OpenFile()
     }
 
     return string(filename);
+}
+
+void Editor::saveAnim(std::string path)
+{
+    ofstream anim(path);
+
+    ///Save header with version
+    anim << "V4Mater-ver-1.00\n";
+
+    ///Save initial animation settings
+    anim << "S:" << to_string_with_precision2(max_time,6) << "\n";
+
+    ///Save object creation
+    for(int i=0; i<objects.size(); i++)
+    {
+        ///Check object type
+        anim << "OI:" << objects[i].texture_path << "\n";
+    }
+
+    ///Save animation segments
+
+    ///Frames
+    for(int i=0; i<objects.size(); i++)
+    {
+        for(int f=0; f<objects[i].frames.size(); f++)
+        {
+            anim << "F:" << "animation_name," << to_string_with_precision2(objects[i].frames[f].time,6) << "," << to_string(i) << "," << objects[i].frames[f].pos_x << "," << objects[i].frames[f].pos_y << "," << objects[i].frames[f].rotation << "," << objects[i].frames[f].or_x << "," << objects[i].frames[f].or_y << "," << objects[i].frames[f].scale_x << "," << objects[i].frames[f].scale_y << "\n";
+        }
+    }
+
+    anim.close();
 }
 
 void Editor::Draw(sf::RenderWindow& window)
@@ -517,5 +558,11 @@ void Editor::Draw(sf::RenderWindow& window)
         timeline.mouseY = mouseY;
         timeline.mouseLeftClick = mouseLeftClick;
         timeline.Draw(window);
+    }
+
+    if(keyMap[sf::Keyboard::S])
+    {
+        cout << "Saving the animation" << endl;
+        saveAnim("data.anim");
     }
 }

@@ -11,6 +11,8 @@ Object::Object()
 void Object::Load(string filename, int xpos, int ypos)
 {
     cout << "Loading object" << endl;
+    texture_path = filename.substr(filename.find_last_of("\\/")+1);
+    cout << "Texture path: " << texture_path << endl;
 
     if(tex_obj.loadFromFile(filename))
     {
