@@ -11,7 +11,7 @@ V4Creator::V4Creator()
 
 void V4Creator::Init()
 {
-    sf::RenderWindow window(sf::VideoMode(1280,720),"V4Mater, the Tree of Life - unnamed.pfo");
+    sf::RenderWindow window(sf::VideoMode(1280,720),"V4Mater, the Tree of Life");
 
     window.setFramerateLimit(240);
     window.setKeyRepeatEnabled(false);

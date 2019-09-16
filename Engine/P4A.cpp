@@ -15,109 +15,100 @@ P4A::P4A()
 
 int P4A::GetFileSize(string filename)
 {
+    ///Reads the size of a file
     std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
-    int fsize = in.tellg();
-    return fsize;
+    return int(in.tellg());
 }
 
 void P4A::LoadFile(string filename)
 {
+    ///Save the original path of the file
     original_path.push_back(filename);
-    cout << "Original path is: " << filename << endl;
 
-    string plain_filename = filename.substr(filename.find_last_of("\\")+1);
+    ///Strip the file name only
+    filenames.push_back(filename.substr(filename.find_last_of("\\")+1));
 
-    filenames.push_back(plain_filename);
-    cout << "File name is: " << plain_filename << endl;
-
-    int filesize = GetFileSize(filename);
-    filesizes.push_back(filesize);
-    cout << "File size is: " << filesize << endl;
+    ///Get the size of a file
+    filesizes.push_back(GetFileSize(filename));
 }
 
 void P4A::CreateDictionary()
 {
+    ///Calculate the full size of dictionary
     for(int i=0; i<filenames.size(); i++)
     {
         dictionary_size += 9 + filenames[i].size();
     }
 
-    cout << "Dictionary size: " << dictionary_size << endl;
-
+    ///Offset where files start
     file_offset = dictionary_size;
 
     for(int i=0; i<filenames.size(); i++)
     {
+        ///Get file name, name's length and convert it to 1 byte signed (what for???)
         string file = filenames[i];
         int filename_length = file.size();
         int8_t length_8bit = filename_length;
 
+        ///Save the 8-bit length
         output_dictionary.push_back(length_8bit);
 
+        ///Save the file's name
         for(int a=0; a<file.size(); a++)
         {
             output_dictionary.push_back(file[a]);
         }
 
-        ///file offset
+        ///Save the file's offset
         output_dictionary.push_back(char(uint32_t(file_offset)));
         output_dictionary.push_back(char(uint32_t(file_offset) >> 8));
         output_dictionary.push_back(char(uint32_t(file_offset) >> 16));
         output_dictionary.push_back(char(uint32_t(file_offset) >> 24));
 
-        ///file size
+        ///Save the file's size
         file_size = filesizes[i];
-        cout << "File size: " << file_size << endl;
 
         output_dictionary.push_back(char(uint32_t(file_size)));
         output_dictionary.push_back(char(uint32_t(file_size) >> 8));
         output_dictionary.push_back(char(uint32_t(file_size) >> 16));
         output_dictionary.push_back(char(uint32_t(file_size) >> 24));
 
+        ///Increment offset by file's size
         file_offset += file_size;
     }
 
-    /// 1101 = 13
-    /// >> 1
-    /// 0110 = 6
-    /// >> 1
-    /// 0011 = 3
-    /// >> 1
-    /// 0001 = 1
-    /// >> 1
-    /// 0000 = 0
-
-    /// 1101|
-    /// 0110|1
-    /// 0011|01
-    /// 0001|101
-    /// 0000|1101
-
+    ///Save the dictionary size to header
     output_header.push_back(char(uint32_t(dictionary_size-8)));
     output_header.push_back(char(uint32_t(dictionary_size-8) >> 8));
     output_header.push_back(char(uint32_t(dictionary_size-8) >> 16));
     output_header.push_back(char(uint32_t(dictionary_size-8) >> 24));
 }
 
-void P4A::Debug_SaveDictionary(string filename)
+void P4A::SaveToFile(string filename)
 {
+    ///Clear the dictionary in case the handle was used before
+    output_dictionary.clear();
+
+    ///Rebuild dictionary
+    CreateDictionary();
+
     ofstream file(filename,std::ios_base::binary);
 
     while(file.is_open())
     {
-        cout << "Writing header..." << endl;
+        ///Write header
         for(int i=0; i<output_header.size(); i++)
         {
             file.put(output_header[i]);
         }
 
-        cout << "Writing dictionary..." << endl;
+        ///Write dictionary
         for(int i=0; i<output_dictionary.size(); i++)
         {
             file.put(output_dictionary[i]);
         }
 
-        cout << "Writing files..." << endl;
+        ///Write files
         for(int i=0; i<filenames.size(); i++)
         {
             ifstream get_file(filenames[i], std::ios_base::binary);
@@ -131,8 +122,6 @@ void P4A::Debug_SaveDictionary(string filename)
         }
 
         file.close();
-
-        cout << "Done!" << endl;
     }
 }
 

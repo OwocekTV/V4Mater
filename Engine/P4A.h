@@ -28,7 +28,7 @@ class P4A
     int GetFileSize(std::string filename);
     void LoadFile(std::string filename);
     void CreateDictionary();
-    void Debug_SaveDictionary(std::string filename);
+    void SaveToFile(std::string filename);
     void DataToImage();
     void EncryptImage();
 

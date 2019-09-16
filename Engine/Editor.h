@@ -73,7 +73,8 @@ class Editor
     Editor();
     std::string OpenArchiveFile();
     std::string OpenFile();
-    void saveAnim(std::string path);
+    void saveAnim();
+    void saveFile(std::string path);
     void Draw(sf::RenderWindow& window);
 };
 

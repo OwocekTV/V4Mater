@@ -5,6 +5,7 @@
 #include <cmath>
 #include <sstream>
 #include "Button.h"
+#include "P4A.h"
 
 using namespace std;
 
@@ -85,9 +86,9 @@ string Editor::OpenFile()
     return string(filename);
 }
 
-void Editor::saveAnim(std::string path)
+void Editor::saveAnim()
 {
-    ofstream anim(path);
+    ofstream anim("data.anim");
 
     ///Save header with version
     anim << "V4Mater-ver-1.00\n";
@@ -114,6 +115,18 @@ void Editor::saveAnim(std::string path)
     }
 
     anim.close();
+}
+
+void Editor::saveFile(std::string path)
+{
+    P4A handle;
+    handle.LoadFile("data.anim");
+    for(int i=0; i<objects.size(); i++)
+    {
+        handle.LoadFile(objects[i].texture_path);
+    }
+
+    handle.SaveToFile("data.p4a");
 }
 
 void Editor::Draw(sf::RenderWindow& window)
@@ -216,8 +229,7 @@ void Editor::Draw(sf::RenderWindow& window)
             p4a.LoadFile(file1);
             p4a.LoadFile(file2);
             p4a.LoadFile(file3);
-            p4a.CreateDictionary();
-            p4a.Debug_SaveDictionary("DebugArchive.P4A");
+            p4a.SaveToFile("DebugArchive.P4A");
         }
 
         state = 0;
@@ -563,6 +575,6 @@ void Editor::Draw(sf::RenderWindow& window)
     if(keyMap[sf::Keyboard::S])
     {
         cout << "Saving the animation" << endl;
-        saveAnim("data.anim");
+        saveFile("data.anim");
     }
 }
