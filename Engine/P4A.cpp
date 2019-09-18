@@ -127,6 +127,8 @@ void P4A::SaveToFile(string filename)
 
 void P4A::ReadDictionary(std::string filename)
 {
+    p4a_filename = filename;
+
     ifstream file(filename, std::ifstream::binary);
 
     char header[3];
@@ -186,6 +188,7 @@ void P4A::ReadDictionary(std::string filename)
                 str_filename = str_filename.substr(0,filename_length);
 
                 cout << "Filename: " << str_filename << endl;
+                in_fnames.push_back(str_filename);
 
                 p4a_offset += filename_length;
 
@@ -194,6 +197,7 @@ void P4A::ReadDictionary(std::string filename)
                 file.seekg(p4a_offset);
                 file.read(reinterpret_cast<char*>(&file_offset), 4);
                 cout << "File offset: " << file_offset << endl;
+                in_foffsets.push_back(file_offset);
 
                 p4a_offset += 4;
 
@@ -202,6 +206,7 @@ void P4A::ReadDictionary(std::string filename)
                 file.seekg(p4a_offset);
                 file.read(reinterpret_cast<char*>(&file_size), 4);
                 cout << "File size: " << file_size << endl;
+                in_fsizes.push_back(file_size);
 
                 p4a_offset += 4;
             }
@@ -218,4 +223,44 @@ void P4A::ReadDictionary(std::string filename)
     }
 
     file.close();
+}
+
+std::string P4A::ReadToMemory(std::string name)
+{
+    for(int i=0; i<in_fnames.size(); i++)
+    {
+        if(in_fnames[i] == name)
+        {
+            ifstream p4(p4a_filename, ios::binary);
+            char buffer[in_fsizes[i]];
+
+            p4.seekg(in_foffsets[i]);
+            p4.read(buffer,in_fsizes[i]);
+
+            p4.close();
+            return string(buffer);
+        }
+    }
+
+    return "";
+}
+
+void P4A::Extract(std::string name)
+{
+    for(int i=0; i<in_fnames.size(); i++)
+    {
+        if(in_fnames[i] == name)
+        {
+            ifstream p4(p4a_filename, ios::binary);
+            char buffer[in_fsizes[i]];
+            p4.seekg(in_foffsets[i]);
+            p4.read(buffer,in_fsizes[i]);
+            p4.close();
+
+
+            ofstream p4o(in_fnames[i], ios::binary | ios::trunc);
+            p4o.write(buffer,in_fsizes[i]);
+            p4o.close();
+        }
+    }
 }
