@@ -35,6 +35,7 @@ class Object
     Object();
     void Load(string filename, int xpos, int ypos);
     void SetFrame(float time);
+    void SetCustomFrame(float in_time, float in_pos_x, float in_pos_y, float in_or_x, float in_or_y, float in_rotation, float in_scale_x, float in_scale_y);
     void SetPos(float time);
     void Draw(sf::RenderWindow& window);
 };

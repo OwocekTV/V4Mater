@@ -45,6 +45,23 @@ void Object::SetFrame(float time)
     std::sort(frames.begin(), frames.end(), [](auto const &a, auto const &b) { return a.time < b.time; });
 }
 
+void Object::SetCustomFrame(float in_time, float in_pos_x, float in_pos_y, float in_or_x, float in_or_y, float in_rotation, float in_scale_x, float in_scale_y)
+{
+    Frame tmp;
+    tmp.time = in_time;
+    tmp.pos_x = in_pos_x;
+    tmp.pos_y = in_pos_y;
+    tmp.or_x = in_or_x;
+    tmp.or_y = in_or_y;
+    tmp.rotation = in_rotation;
+    tmp.scale_x = in_scale_x;
+    tmp.scale_y = in_scale_y;
+
+    frames.push_back(tmp);
+
+    std::sort(frames.begin(), frames.end(), [](auto const &a, auto const &b) { return a.time < b.time; });
+}
+
 void Object::SetPos(float time)
 {
     for(int i=0; i<frames.size(); i++)
