@@ -34,7 +34,7 @@ class Editor
 
     sf::Text t_curframes;
 
-    int state = 3;
+    int state = 0;
     std::string archiveFile = "";
 
     P4A p4a;
@@ -74,6 +74,7 @@ class Editor
     std::string OpenArchiveFile();
     std::string OpenFile();
     void saveAnim();
+    void loadAnim(std::string data, P4A handle);
     void saveFile(std::string path);
     void Draw(sf::RenderWindow& window);
 };

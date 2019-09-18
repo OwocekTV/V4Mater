@@ -18,9 +18,35 @@ std::string to_string_with_precision2(const T a_value, const int n = 2)
     return out.str();
 }
 
+std::vector<std::string> split(const std::string &s, char delim)
+{
+	std::vector<std::string> elems;
+
+	std::stringstream ss(s);
+	std::string item;
+	while(std::getline(ss, item, delim))
+	{
+		elems.push_back(item);
+	}
+
+	return elems;
+}
+
 Editor::Editor()
 {
     view.setSize(1280,720);
+
+    font.loadFromFile("resources/opensans.ttf");
+
+    t_logo.setFont(font);
+    t_newfile.setFont(font);
+    t_loadfile.setFont(font);
+    t_logo.setString("logo");
+    t_newfile.setString("newfile");
+    t_loadfile.setString("loadfile");
+    t_logo.setFillColor(sf::Color::Black);
+    t_newfile.setFillColor(sf::Color::Black);
+    t_loadfile.setFillColor(sf::Color::Black);
 }
 
 string Editor::OpenArchiveFile()
@@ -44,16 +70,11 @@ string Editor::OpenArchiveFile()
     }
     else
     {
-        switch (CommDlgExtendedError())
-        {
-            default                    : std::cout << "You cancelled.\n";
-            return "";
-        }
+        return "";
     }
 
     return string(filename);
 }
-
 
 string Editor::OpenFile()
 {
@@ -88,7 +109,7 @@ string Editor::OpenFile()
 
 void Editor::saveAnim()
 {
-    ofstream anim("data.anim");
+    ofstream anim(directory+"data.anim", ios::binary);
 
     ///Save header with version
     anim << "V4Mater-ver-1.00\n";
@@ -117,16 +138,92 @@ void Editor::saveAnim()
     anim.close();
 }
 
+void Editor::loadAnim(std::string data, P4A handle)
+{
+    bool legit = false;
+    string version = "";
+
+    istringstream iss(data);
+    string line;
+    while(getline(iss, line))
+    {
+        if(line.find("V4Mater-ver-") != std::string::npos)
+        {
+            version = line.substr(line.find_last_of("-")+1);
+            legit = true;
+
+            cout << "Anim format legit. Version " << version << endl;
+        }
+
+        /**
+        [READ] V4Mater-ver-1.00
+        [READ] S:9.799995
+        [READ] OI:button_idle.png
+        [READ] F:animation_name,0.000000,0,106,502,0,24,24,1,1
+        [READ] F:animation_name,8.003246,0,1055,146,180.875,24,24,1,1
+        */
+
+        if(legit)
+        {
+            if(version == "1.00")
+            {
+                cout << "[READ " << version << "]: " << line << endl;
+
+                if(line.find("S:") != std::string::npos)
+                {
+                    max_time = atof(line.substr(line.find_first_of(":")+1).c_str());
+                    cout << "Time: " << max_time << endl;
+                }
+
+                if(line.find("OI:") != std::string::npos)
+                {
+                    string tex_file = line.substr(line.find_first_of(":")+1);
+                    handle.Extract(tex_file);
+
+                    Object tmp;
+                    tmp.Load(tex_file,0,0);
+                    tmp.layer = objects.size();
+                    objects.push_back(tmp);
+
+                    cout << "Added new object from " << tex_file << endl;
+                }
+
+                if(line.find("F:") != std::string::npos)
+                {
+                    string framedata = line.substr(line.find_first_of(":")+1);
+                    vector<string> frame = split(framedata,',');
+
+                    string animation_name = frame[0];
+
+                    float time = atof(frame[1].c_str());
+                    int objectID = atoi(frame[2].c_str());
+
+                    float pos_x = atof(frame[3].c_str());
+                    float pos_y = atof(frame[4].c_str());
+                    float rotation = atof(frame[5].c_str());
+                    float or_x = atof(frame[6].c_str());
+                    float or_y = atof(frame[7].c_str());
+                    float scale_x = atof(frame[8].c_str());
+                    float scale_y = atof(frame[9].c_str());
+                    objects[objectID].SetCustomFrame(time,pos_x,pos_y,or_x,or_y,rotation,scale_x,scale_y);
+                }
+            }
+        }
+    }
+}
+
 void Editor::saveFile(std::string path)
 {
+    saveAnim();
+
     P4A handle;
-    handle.LoadFile("data.anim");
+    handle.LoadFile(directory+"data.anim");
     for(int i=0; i<objects.size(); i++)
     {
         handle.LoadFile(objects[i].texture_path);
     }
 
-    handle.SaveToFile("data.p4a");
+    handle.SaveToFile(directory+"data.p4a");
 }
 
 void Editor::Draw(sf::RenderWindow& window)
@@ -215,6 +312,17 @@ void Editor::Draw(sf::RenderWindow& window)
     if(state == 1)
     {
         p4a.ReadDictionary(archiveFile);
+        string animdata = p4a.ReadToMemory("data.anim");
+
+        if(animdata == "")
+        {
+            cout << "Invalid animation file!" << endl;
+            state = 0;
+        }
+
+        //cout << animdata << endl;
+        loadAnim(animdata,p4a);
+
         state = 3;
     }
 
@@ -575,6 +683,6 @@ void Editor::Draw(sf::RenderWindow& window)
     if(keyMap[sf::Keyboard::S])
     {
         cout << "Saving the animation" << endl;
-        saveFile("data.anim");
+        saveFile("");
     }
 }
