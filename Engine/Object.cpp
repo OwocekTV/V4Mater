@@ -64,8 +64,14 @@ void Object::SetCustomFrame(float in_time, float in_pos_x, float in_pos_y, float
 
 void Object::SetPos(float time)
 {
+    if(debug)
+    cout << "[OBJ] SETPOS called" << endl;
+
     for(int i=0; i<frames.size(); i++)
     {
+        if(debug)
+        cout << "[OBJ] Check frame " << i << ", ftime " << frames[i].time << " vs " << time << " sz: " << frames.size()-1 << " >= " << i+1 << endl;
+
         if(frames[i].time < time)
         {
             if(frames.size()-1 >= i+1)
@@ -74,6 +80,9 @@ void Object::SetPos(float time)
 
                 if(frames[i+1].time > time)
                 {
+                    if(debug)
+                    cout << "[OBJ] HANDLER 1: another frame, calc inbetween" << endl;
+
                     ///Calculate in-between positions
                     float time_diff = frames[i+1].time - frames[i].time;
                     float time_pos = time - frames[i].time;
@@ -86,11 +95,28 @@ void Object::SetPos(float time)
                     or_y = frames[i].or_y + ((frames[i+1].or_y - frames[i].or_y) * time_percentage);
                     s_x = frames[i].scale_x + ((frames[i+1].scale_x - frames[i].scale_x) * time_percentage);
                     s_y = frames[i].scale_y + ((frames[i+1].scale_y - frames[i].scale_y) * time_percentage);
+
+                    break;
+                }
+                else
+                {
+                    if(debug)
+                    cout << "[OBJ] HANDLER 4: skip or get last pos" << endl;
+
+                    x = frames[frames.size()-1].pos_x;
+                    y = frames[frames.size()-1].pos_y;
+                    r = frames[frames.size()-1].rotation;
+                    or_x = frames[frames.size()-1].or_x;
+                    or_y = frames[frames.size()-1].or_y;
+                    s_x = frames[frames.size()-1].scale_x;
+                    s_y = frames[frames.size()-1].scale_y;
                 }
             }
             else
             {
-                ///thats the last frame
+                if(debug)
+                cout << "[OBJ] HANDLER 2: last frame, get last pos" << endl;
+
                 x = frames[i].pos_x;
                 y = frames[i].pos_y;
                 r = frames[i].rotation;
@@ -98,7 +124,24 @@ void Object::SetPos(float time)
                 or_y = frames[i].or_y;
                 s_x = frames[i].scale_x;
                 s_y = frames[i].scale_y;
+
+                break;
             }
+        }
+        else
+        {
+            if(debug)
+            cout << "[OBJ] HANDLER 3: first frame/before first frame, get first pos" << endl;
+
+            x = frames[i].pos_x;
+            y = frames[i].pos_y;
+            r = frames[i].rotation;
+            or_x = frames[i].or_x;
+            or_y = frames[i].or_y;
+            s_x = frames[i].scale_x;
+            s_y = frames[i].scale_y;
+
+            break;
         }
     }
 }

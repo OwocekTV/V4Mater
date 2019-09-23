@@ -7,6 +7,9 @@ using namespace std;
 
 class Object
 {
+    private:
+    bool debug = true;
+
     public:
     std::string texture_path;
 

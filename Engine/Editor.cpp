@@ -210,6 +210,11 @@ void Editor::loadAnim(std::string data, P4A handle)
             }
         }
     }
+
+    for(int i=0; i<objects.size(); i++)
+    {
+        objects[i].SetPos(timeline.cur_pos);
+    }
 }
 
 void Editor::saveFile(std::string path)
