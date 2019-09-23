@@ -49,32 +49,9 @@ Editor::Editor()
     t_loadfile.setFillColor(sf::Color::Black);
 }
 
-string Editor::OpenArchiveFile()
-{
-    char filename[MAX_PATH];
-
-    OPENFILENAME ofn;
-    ZeroMemory(&filename, sizeof(filename));
-    ZeroMemory(&ofn,      sizeof(ofn));
-    ofn.lStructSize  = sizeof( ofn );
-    ofn.hwndOwner    = NULL;  // If you have a window to center over, put its HANDLE here
-    ofn.lpstrFilter  = "Patafour Archive Format\0*.P4A\0";
-    ofn.lpstrFile    = filename;
-    ofn.nMaxFile     = MAX_PATH;
-    ofn.lpstrTitle   = "Select a file";
-    ofn.Flags        = OFN_FILEMUSTEXIST;
-
-    if (GetOpenFileNameA( &ofn ))
-    {
-        std::cout << "You chose the file \"" << filename << "\"\n";
-    }
-    else
-    {
-        return "";
-    }
-
-    return string(filename);
-}
+/// /////////////// ///
+/// WINDOWS.H START ///
+/// /////////////// ///
 
 string Editor::OpenFile()
 {
@@ -84,24 +61,20 @@ string Editor::OpenFile()
     ZeroMemory(&filename, sizeof(filename));
     ZeroMemory(&ofn,      sizeof(ofn));
     ofn.lStructSize  = sizeof( ofn );
-    ofn.hwndOwner    = NULL;  // If you have a window to center over, put its HANDLE here
+    ofn.hwndOwner    = NULL;
     ofn.lpstrFilter  = "All files\0*.*\0";
     ofn.lpstrFile    = filename;
     ofn.nMaxFile     = MAX_PATH;
     ofn.lpstrTitle   = "Select a file";
     ofn.Flags        = OFN_FILEMUSTEXIST;
 
-    if (GetOpenFileNameA( &ofn ))
+    if(GetOpenFileNameA(&ofn))
     {
-        std::cout << "You chose the file \"" << filename << "\"\n";
+        std::cout << filename << endl;
     }
     else
     {
-        switch (CommDlgExtendedError())
-        {
-            default                    : std::cout << "You cancelled.\n";
-            return "";
-        }
+        return "";
     }
 
     return string(filename);
@@ -115,28 +88,27 @@ string Editor::SaveFile()
     ZeroMemory(&filename, sizeof(filename));
     ZeroMemory(&ofn,      sizeof(ofn));
     ofn.lStructSize  = sizeof( ofn );
-    ofn.hwndOwner    = NULL;  // If you have a window to center over, put its HANDLE here
-    ofn.lpstrFilter  = "Patafour Archive Format (.p4a)\0*.P4A\0";
+    ofn.hwndOwner    = NULL;
+    ofn.lpstrFilter  = "All files\0*.*\0";
     ofn.lpstrFile    = filename;
     ofn.nMaxFile     = MAX_PATH;
-    ofn.lpstrTitle   = "Save animation file";
-    //ofn.Flags        = OFN_FILEMUSTEXIST;
+    ofn.lpstrTitle   = "Select a file";
 
-    if (GetSaveFileNameA( &ofn ))
+    if(GetSaveFileNameA(&ofn))
     {
-        std::cout << "You chose the name \"" << filename << "\"\n";
+        std::cout << filename << endl;
     }
     else
     {
-        switch (CommDlgExtendedError())
-        {
-            default                    : std::cout << "You cancelled.\n";
-            return "";
-        }
+        return "";
     }
 
     return string(filename);
 }
+
+/// ///////////// ///
+/// WINDOWS.H END ///
+/// ///////////// ///
 
 void Editor::saveAnim()
 {
@@ -250,20 +222,6 @@ void Editor::loadAnim(std::string data, P4A handle)
     }
 }
 
-void Editor::saveFile(std::string path)
-{
-    saveAnim();
-
-    P4A handle;
-    handle.LoadFile(directory+"data.anim");
-    for(int i=0; i<objects.size(); i++)
-    {
-        handle.LoadFile(objects[i].texture_path);
-    }
-
-    handle.SaveToFile(directory+"data.p4a");
-}
-
 void Editor::Draw(sf::RenderWindow& window)
 {
     if(buttons_loaded == false)
@@ -281,104 +239,6 @@ void Editor::Draw(sf::RenderWindow& window)
         buttons[10].Load(12, directory);
 
         buttons_loaded = true;
-    }
-
-    if(state == 0)
-    {
-        t_logo.setOrigin(t_logo.getGlobalBounds().width/2,t_logo.getGlobalBounds().height/2);
-        t_logo.setPosition(window.getSize().x/2,25);
-
-        window.draw(t_logo);
-
-        t_newfile.setOrigin(t_newfile.getGlobalBounds().width/2,t_newfile.getGlobalBounds().height/2);
-        t_newfile.setPosition(window.getSize().x/2,120);
-
-        t_newfile.setFillColor(sf::Color::Black);
-
-        if(mouseX > t_newfile.getPosition().x-t_newfile.getGlobalBounds().width/2)
-        {
-            if(mouseX < t_newfile.getPosition().x+t_newfile.getGlobalBounds().width/2)
-            {
-                if(mouseY > t_newfile.getPosition().y-t_newfile.getGlobalBounds().height/2+10)
-                {
-                    if(mouseY < t_newfile.getPosition().y+t_newfile.getGlobalBounds().height/2+10)
-                    {
-                        t_newfile.setFillColor(sf::Color::Green);
-
-                        if(mouseLeftClick == true)
-                        {
-                            state = 1;
-                        }
-                    }
-                }
-            }
-        }
-
-        t_loadfile.setOrigin(t_loadfile.getGlobalBounds().width/2,t_loadfile.getGlobalBounds().height/2);
-        t_loadfile.setPosition(window.getSize().x/2,200);
-
-        t_loadfile.setFillColor(sf::Color::Black);
-
-        if(mouseX > t_loadfile.getPosition().x-t_loadfile.getGlobalBounds().width/2)
-        {
-            if(mouseX < t_loadfile.getPosition().x+t_loadfile.getGlobalBounds().width/2)
-            {
-                if(mouseY > t_loadfile.getPosition().y-t_loadfile.getGlobalBounds().height/2+10)
-                {
-                    if(mouseY < t_loadfile.getPosition().y+t_loadfile.getGlobalBounds().height/2+10)
-                    {
-                        t_loadfile.setFillColor(sf::Color::Green);
-
-                        if(mouseLeftClick == true)
-                        {
-                            archiveFile = OpenArchiveFile();
-
-                            if(archiveFile != "")
-                            {
-                                state = 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        window.draw(t_newfile);
-        window.draw(t_loadfile);
-    }
-
-    if(state == 1)
-    {
-        p4a.ReadDictionary(archiveFile);
-        string animdata = p4a.ReadToMemory("data.anim");
-
-        if(animdata == "")
-        {
-            cout << "Invalid animation file!" << endl;
-            state = 0;
-        }
-
-        //cout << animdata << endl;
-        loadAnim(animdata,p4a);
-
-        state = 3;
-    }
-
-    if(state == 2)
-    {
-        string file1 = OpenFile();
-        string file2 = OpenFile();
-        string file3 = OpenFile();
-
-        if(file1 != "")
-        {
-            p4a.LoadFile(file1);
-            p4a.LoadFile(file2);
-            p4a.LoadFile(file3);
-            p4a.SaveToFile("DebugArchive.P4A");
-        }
-
-        state = 0;
     }
 
     if(state == 3)
@@ -420,8 +280,6 @@ void Editor::Draw(sf::RenderWindow& window)
             }
 
             timeline_old = timeline.cur_pos;
-
-            //cout << "object_s: " << object_selected << endl;
 
             if(object_selected >= 0)
             {
@@ -472,12 +330,8 @@ void Editor::Draw(sf::RenderWindow& window)
                                 object_offset = true;
                             }
 
-                            //cout << "mX: " << mX << " mY: " << mY << endl;
-
                             objects[object_selected].x = mouseX + mX;
                             objects[object_selected].y = mouseY + mY;
-
-                            //cout << "X: " << objects[object_selected].x-640 << " Y: " << objects[object_selected].y-360 << endl;
                         }
 
                         if(allowRotate)
@@ -588,7 +442,6 @@ void Editor::Draw(sf::RenderWindow& window)
                                         state = 0;
                                     }
 
-                                    //cout << animdata << endl;
                                     loadAnim(animdata,p4a);
                                     timeline.Create(max_time,window);
                                 }
@@ -760,36 +613,10 @@ void Editor::Draw(sf::RenderWindow& window)
             }
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            max_time -= 0.01;
-
-            if(max_time <= 0)
-            max_time = 0.01;
-
-            if(timeline.cur_pos >= max_time)
-            timeline.cur_pos = max_time;
-
-            timeline.Create(max_time,window);
-        }
-
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        {
-            max_time += 0.01;
-
-            timeline.Create(max_time,window);
-        }
-
         timeline.max_time = max_time;
         timeline.mouseX = mouseX;
         timeline.mouseY = mouseY;
         timeline.mouseLeftClick = mouseLeftClick;
         timeline.Draw(window);
-    }
-
-    if(keyMap[sf::Keyboard::S])
-    {
-        cout << "Saving the animation" << endl;
-        saveFile("");
     }
 }

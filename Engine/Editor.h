@@ -71,12 +71,10 @@ class Editor
     sf::RectangleShape r_selected;
 
     Editor();
-    std::string OpenArchiveFile();
     std::string OpenFile();
     std::string SaveFile();
     void saveAnim();
     void loadAnim(std::string data, P4A handle);
-    void saveFile(std::string path);
     void Draw(sf::RenderWindow& window);
 };
 
