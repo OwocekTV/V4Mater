@@ -8,7 +8,7 @@ using namespace std;
 class Object
 {
     private:
-    bool debug = true;
+    bool debug = false;
 
     public:
     std::string texture_path;

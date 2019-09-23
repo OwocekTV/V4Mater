@@ -107,6 +107,37 @@ string Editor::OpenFile()
     return string(filename);
 }
 
+string Editor::SaveFile()
+{
+    char filename[MAX_PATH];
+
+    OPENFILENAME ofn;
+    ZeroMemory(&filename, sizeof(filename));
+    ZeroMemory(&ofn,      sizeof(ofn));
+    ofn.lStructSize  = sizeof( ofn );
+    ofn.hwndOwner    = NULL;  // If you have a window to center over, put its HANDLE here
+    ofn.lpstrFilter  = "Patafour Archive Format (.p4a)\0*.P4A\0";
+    ofn.lpstrFile    = filename;
+    ofn.nMaxFile     = MAX_PATH;
+    ofn.lpstrTitle   = "Save animation file";
+    //ofn.Flags        = OFN_FILEMUSTEXIST;
+
+    if (GetSaveFileNameA( &ofn ))
+    {
+        std::cout << "You chose the name \"" << filename << "\"\n";
+    }
+    else
+    {
+        switch (CommDlgExtendedError())
+        {
+            default                    : std::cout << "You cancelled.\n";
+            return "";
+        }
+    }
+
+    return string(filename);
+}
+
 void Editor::saveAnim()
 {
     ofstream anim(directory+"data.anim", ios::binary);
@@ -140,6 +171,8 @@ void Editor::saveAnim()
 
 void Editor::loadAnim(std::string data, P4A handle)
 {
+    objects.clear();
+
     bool legit = false;
     string version = "";
 
@@ -529,6 +562,67 @@ void Editor::Draw(sf::RenderWindow& window)
                         cout << "Execute button " << i << endl;
                         switch(i)
                         {
+                            ///New file
+                            case 0:
+                            {
+                                objects.clear();
+                                max_time = 10;
+                                timeline.Create(max_time,window);
+
+                                break;
+                            }
+
+                            ///Load file
+                            case 1:
+                            {
+                                string openP4A = OpenFile();
+
+                                if(openP4A != "")
+                                {
+                                    p4a.ReadDictionary(openP4A);
+                                    string animdata = p4a.ReadToMemory("data.anim");
+
+                                    if(animdata == "")
+                                    {
+                                        cout << "Invalid animation file!" << endl;
+                                        state = 0;
+                                    }
+
+                                    //cout << animdata << endl;
+                                    loadAnim(animdata,p4a);
+                                    timeline.Create(max_time,window);
+                                }
+
+                                break;
+                            }
+
+                            ///Save file
+                            case 2:
+                            {
+                                string sfile = SaveFile();
+
+                                if(sfile != "")
+                                {
+                                    if(sfile.find(".p4a") == std::string::npos)
+                                    {
+                                        sfile += ".p4a";
+                                    }
+
+                                    saveAnim();
+
+                                    P4A handle;
+                                    handle.LoadFile(directory+"data.anim");
+                                    for(int i=0; i<objects.size(); i++)
+                                    {
+                                        handle.LoadFile(objects[i].texture_path);
+                                    }
+
+                                    handle.SaveToFile(sfile);
+                                }
+
+                                break;
+                            }
+
                             case 5: ///Selection Tool
                             {
                                 if(buttons[i].selected)
@@ -572,12 +666,16 @@ void Editor::Draw(sf::RenderWindow& window)
                             case 7: ///Add object button
                             {
                                 string tex_file = OpenFile();
-                                Object tmp;
-                                tmp.Load(tex_file, window.getSize().x/2,window.getSize().y/2);
-                                tmp.layer = objects.size();
-                                objects.push_back(tmp);
 
-                                cout << "Added new object from " << tex_file << endl;
+                                if(tex_file != "")
+                                {
+                                    Object tmp;
+                                    tmp.Load(tex_file, window.getSize().x/2,window.getSize().y/2);
+                                    tmp.layer = objects.size();
+                                    objects.push_back(tmp);
+
+                                    cout << "Added new object from " << tex_file << endl;
+                                }
 
                                 break;
                             }
@@ -623,8 +721,12 @@ void Editor::Draw(sf::RenderWindow& window)
 
                             case 10:
                             {
-                                cout << "Record frame at " << timeline.cur_pos << " object " << object_selected << endl;
-                                objects[object_selected].SetFrame(timeline.cur_pos);
+                                if(object_selected > -1)
+                                {
+                                    cout << "Record frame at " << timeline.cur_pos << " object " << object_selected << endl;
+                                    objects[object_selected].SetFrame(timeline.cur_pos);
+                                }
+
                                 break;
                             }
                         }
