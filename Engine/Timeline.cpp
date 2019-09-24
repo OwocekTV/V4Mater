@@ -46,7 +46,7 @@ void Timeline::Create(float time, sf::RenderWindow& window)
     int mline_x = main_line.getPosition().x - (mline_length / 2);
     int mline_y = main_line.getPosition().y;
 
-    cout << mline_x << " " << mline_length << endl;
+    //cout << mline_x << " " << mline_length << endl;
 
     int a_big = 5;
 
@@ -54,7 +54,7 @@ void Timeline::Create(float time, sf::RenderWindow& window)
     {
         float big_gap = float(mline_length) / float(a_big);
         float time_gap = float(time) / float(a_big);
-        cout << "big_gap:" << big_gap << endl;
+        //cout << "big_gap:" << big_gap << endl;
 
         sf::RectangleShape tmp_big(sf::Vector2f(4,32));
         tmp_big.setOrigin(tmp_big.getGlobalBounds().width/2,tmp_big.getGlobalBounds().height/2);
