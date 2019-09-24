@@ -38,7 +38,7 @@ class Editor
     std::string archiveFile = "";
 
     P4A p4a;
-    Button buttons[11];
+    Button buttons[14];
     int clickedOn = -1;
     bool playing = false;
 
@@ -61,6 +61,8 @@ class Editor
 
     bool allowMove = false;
     bool allowRotate = false;
+    bool allowScale = false;
+    bool allowOrigin = false;
 
     ///TEMPORARY
     float oldrot = 0;

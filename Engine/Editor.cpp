@@ -236,7 +236,9 @@ void Editor::Draw(sf::RenderWindow& window)
         buttons[7].Load(8, directory);
         buttons[8].Load(9, directory);
         buttons[9].Load(10, directory);
-        buttons[10].Load(12, directory);
+        buttons[10].Load(11, directory);
+        buttons[11].Load(12, directory);
+        buttons[12].Load(14, directory);
 
         buttons_loaded = true;
     }
@@ -375,14 +377,14 @@ void Editor::Draw(sf::RenderWindow& window)
         {
             timeline.Create(max_time,window);
 
-            for(int i=0; i<11; i++)
+            for(int i=0; i<13; i++)
             {
                 int add = 0;
 
                 if(i > 4)
-                add = 46;
+                add = 34;
 
-                buttons[i].setPosition(window.getSize().x - 48, 46*i+add);
+                buttons[i].setPosition(window.getSize().x - 36, 34*i+add);
             }
 
             isResized = false;
@@ -392,7 +394,7 @@ void Editor::Draw(sf::RenderWindow& window)
         /// ///////// Buttons ///////// ///
         /// /////////////////////////// ///
 
-        for(int i=0; i<11; i++)
+        for(int i=0; i<13; i++)
         {
             if(clickedOn == -1)
             {
@@ -490,8 +492,12 @@ void Editor::Draw(sf::RenderWindow& window)
                                 }
 
                                 buttons[6].setSelected(false);
+                                buttons[7].setSelected(false);
+                                buttons[8].setSelected(false);
 
                                 allowRotate = false;
+                                allowScale = false;
+                                allowOrigin = false;
 
                                 break;
                             }
@@ -510,13 +516,65 @@ void Editor::Draw(sf::RenderWindow& window)
                                 }
 
                                 buttons[5].setSelected(false);
+                                buttons[7].setSelected(false);
+                                buttons[8].setSelected(false);
 
                                 allowMove = false;
+                                allowScale = false;
+                                allowOrigin = false;
 
                                 break;
                             }
 
-                            case 7: ///Add object button
+                            case 7: ///Scale Tool
+                            {
+                                if(buttons[i].selected)
+                                {
+                                    buttons[i].setSelected(false);
+                                    allowRotate = false;
+                                }
+                                else
+                                {
+                                    buttons[i].setSelected(true);
+                                    allowRotate = true;
+                                }
+
+                                buttons[5].setSelected(false);
+                                buttons[6].setSelected(false);
+                                buttons[8].setSelected(false);
+
+                                allowMove = false;
+                                allowRotate = false;
+                                allowOrigin = false;
+
+                                break;
+                            }
+
+                            case 8: ///Origin Tool
+                            {
+                                if(buttons[i].selected)
+                                {
+                                    buttons[i].setSelected(false);
+                                    allowRotate = false;
+                                }
+                                else
+                                {
+                                    buttons[i].setSelected(true);
+                                    allowRotate = true;
+                                }
+
+                                buttons[5].setSelected(false);
+                                buttons[6].setSelected(false);
+                                buttons[7].setSelected(false);
+
+                                allowMove = false;
+                                allowRotate = false;
+                                allowScale = false;
+
+                                break;
+                            }
+
+                            case 9: ///Add object button
                             {
                                 string tex_file = OpenFile();
 
@@ -533,7 +591,7 @@ void Editor::Draw(sf::RenderWindow& window)
                                 break;
                             }
 
-                            case 9: ///Play/Stop button
+                            case 11: ///Play/Stop button
                             {
                                 if(playing)
                                 {
@@ -543,9 +601,11 @@ void Editor::Draw(sf::RenderWindow& window)
                                     buttons[6].setEnabled(true);
                                     buttons[7].setEnabled(true);
                                     buttons[8].setEnabled(true);
+                                    buttons[9].setEnabled(true);
                                     buttons[10].setEnabled(true);
+                                    buttons[12].setEnabled(true);
 
-                                    buttons[i].Load(10, directory);
+                                    buttons[i].Load(12, directory);
                                 }
                                 else
                                 {
@@ -555,24 +615,28 @@ void Editor::Draw(sf::RenderWindow& window)
                                     buttons[6].setEnabled(false);
                                     buttons[7].setEnabled(false);
                                     buttons[8].setEnabled(false);
+                                    buttons[9].setEnabled(false);
                                     buttons[10].setEnabled(false);
+                                    buttons[12].setEnabled(false);
 
                                     buttons[5].setSelected(false);
                                     buttons[6].setSelected(false);
                                     buttons[7].setSelected(false);
                                     buttons[8].setSelected(false);
+                                    buttons[9].setSelected(false);
                                     buttons[10].setSelected(false);
+                                    buttons[12].setSelected(false);
 
                                     allowMove = false;
                                     allowRotate = false;
 
-                                    buttons[i].Load(11, directory);
+                                    buttons[i].Load(13, directory);
                                 }
 
                                 break;
                             }
 
-                            case 10:
+                            case 12:
                             {
                                 if(object_selected > -1)
                                 {

@@ -18,99 +18,90 @@ void Button::Load(int type, string directory)
         case 1:
         {
             tex_icon.loadFromFile(directory+"resources/ui/icon_new.png");
-            icon.setTexture(tex_icon);
-
             break;
         }
 
         case 2:
         {
             tex_icon.loadFromFile(directory+"resources/ui/icon_open.png");
-            icon.setTexture(tex_icon);
-
             break;
         }
 
         case 3:
         {
             tex_icon.loadFromFile(directory+"resources/ui/icon_save.png");
-            icon.setTexture(tex_icon);
-
             break;
         }
 
         case 4:
         {
             tex_icon.loadFromFile(directory+"resources/ui/icon_info.png");
-            icon.setTexture(tex_icon);
-
             break;
         }
 
         case 5:
         {
             tex_icon.loadFromFile(directory+"resources/ui/icon_animation.png");
-            icon.setTexture(tex_icon);
-
             break;
         }
 
         case 6:
         {
             tex_icon.loadFromFile(directory+"resources/ui/icon_select.png");
-            icon.setTexture(tex_icon);
-
             break;
         }
 
         case 7:
         {
             tex_icon.loadFromFile(directory+"resources/ui/icon_rotate.png");
-            icon.setTexture(tex_icon);
-
             break;
         }
 
         case 8:
         {
-            tex_icon.loadFromFile(directory+"resources/ui/icon_add.png");
-            icon.setTexture(tex_icon);
-
+            tex_icon.loadFromFile(directory+"resources/ui/icon_scale.png");
             break;
         }
 
         case 9:
         {
-            tex_icon.loadFromFile(directory+"resources/ui/icon_remove.png");
-            icon.setTexture(tex_icon);
-
+            tex_icon.loadFromFile(directory+"resources/ui/icon_origin.png");
             break;
         }
 
         case 10:
         {
-            tex_icon.loadFromFile(directory+"resources/ui/icon_play.png");
-            icon.setTexture(tex_icon);
-
+            tex_icon.loadFromFile(directory+"resources/ui/icon_add.png");
             break;
         }
 
         case 11:
         {
-            tex_icon.loadFromFile(directory+"resources/ui/icon_pause.png");
-            icon.setTexture(tex_icon);
-
+            tex_icon.loadFromFile(directory+"resources/ui/icon_remove.png");
             break;
         }
 
         case 12:
         {
-            tex_icon.loadFromFile(directory+"resources/ui/icon_record.png");
-            icon.setTexture(tex_icon);
+            tex_icon.loadFromFile(directory+"resources/ui/icon_play.png");
+            break;
+        }
 
+        case 13:
+        {
+            tex_icon.loadFromFile(directory+"resources/ui/icon_pause.png");
+            break;
+        }
+
+        case 14:
+        {
+            tex_icon.loadFromFile(directory+"resources/ui/icon_record.png");
             break;
         }
     }
+
+
+    icon.setTexture(tex_icon);
 }
 
 void Button::setPosition(int x, int y)
@@ -126,9 +117,9 @@ bool Button::isClicked(int mouseX, int mouseY, bool mouseLeftClick)
         return false;
     }
 
-    if((mouseX >= button.getPosition().x) && (mouseX <= button.getPosition().x + 48))
+    if((mouseX >= button.getPosition().x) && (mouseX <= button.getPosition().x + button.getGlobalBounds().width))
     {
-        if((mouseY >= button.getPosition().y) && (mouseY < button.getPosition().y + 48))
+        if((mouseY >= button.getPosition().y) && (mouseY < button.getPosition().y + button.getGlobalBounds().width))
         {
             if(mouseLeftClick == true)
             {
@@ -142,9 +133,9 @@ bool Button::isClicked(int mouseX, int mouseY, bool mouseLeftClick)
 
 bool Button::isHovered(int mouseX, int mouseY)
 {
-    if((mouseX >= button.getPosition().x) && (mouseX <= button.getPosition().x + 48))
+    if((mouseX >= button.getPosition().x) && (mouseX <= button.getPosition().x + button.getGlobalBounds().width))
     {
-        if((mouseY >= button.getPosition().y) && (mouseY < button.getPosition().y + 48))
+        if((mouseY >= button.getPosition().y) && (mouseY < button.getPosition().y + button.getGlobalBounds().width))
         {
             return true;
         }
