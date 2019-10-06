@@ -28,6 +28,20 @@ void Object::Load(string filename, int xpos, int ypos)
     }
 }
 
+void Object::Load(sf::Texture& texture, int xpos, int ypos)
+{
+    tex_obj = texture;
+    s_obj.setTexture(tex_obj);
+
+    or_x = s_obj.getGlobalBounds().width/2;
+    or_y = s_obj.getGlobalBounds().height/2;
+
+    x = xpos;
+    y = ypos;
+
+    cout << "Object loaded successfully" << endl;
+}
+
 void Object::SetFrame(float time)
 {
     Frame tmp;
@@ -64,8 +78,7 @@ void Object::SetCustomFrame(float in_time, float in_pos_x, float in_pos_y, float
 
 void Object::SetPos(float time)
 {
-    if(debug)
-    cout << "[OBJ] SETPOS called" << endl;
+    //cout << "[OBJ] SETPOS called @ " << time << endl;
 
     for(int i=0; i<frames.size(); i++)
     {
@@ -82,6 +95,10 @@ void Object::SetPos(float time)
                 {
                     if(debug)
                     cout << "[OBJ] HANDLER 1: another frame, calc inbetween" << endl;
+
+                    old_x = x;
+                    old_y = y;
+                    old_r = r;
 
                     ///Calculate in-between positions
                     float time_diff = frames[i+1].time - frames[i].time;
@@ -103,6 +120,10 @@ void Object::SetPos(float time)
                     if(debug)
                     cout << "[OBJ] HANDLER 4: skip or get last pos" << endl;
 
+                    old_x = x;
+                    old_y = y;
+                    old_r = r;
+
                     x = frames[frames.size()-1].pos_x;
                     y = frames[frames.size()-1].pos_y;
                     r = frames[frames.size()-1].rotation;
@@ -116,6 +137,10 @@ void Object::SetPos(float time)
             {
                 if(debug)
                 cout << "[OBJ] HANDLER 2: last frame, get last pos" << endl;
+
+                old_x = x;
+                old_y = y;
+                old_r = r;
 
                 x = frames[i].pos_x;
                 y = frames[i].pos_y;
@@ -133,6 +158,10 @@ void Object::SetPos(float time)
             if(debug)
             cout << "[OBJ] HANDLER 3: first frame/before first frame, get first pos" << endl;
 
+            old_x = x;
+            old_y = y;
+            old_r = r;
+
             x = frames[i].pos_x;
             y = frames[i].pos_y;
             r = frames[i].rotation;
@@ -144,13 +173,17 @@ void Object::SetPos(float time)
             break;
         }
     }
+
+   // cout << x << " " << y << " " << r << " " << or_x << " " << or_y << " " << s_x << " " << s_y << endl;
 }
 
 void Object::Draw(sf::RenderWindow& window)
 {
     s_obj.setTexture(tex_obj);
+    s_obj.setScale(s_x,s_y);
     s_obj.setOrigin(or_x,or_y);
     s_obj.setPosition(x,y);
     s_obj.setRotation(r);
+    s_obj.move(256,256);
     window.draw(s_obj);
 }

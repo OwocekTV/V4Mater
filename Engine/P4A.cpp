@@ -227,21 +227,31 @@ void P4A::ReadDictionary(std::string filename)
 
 std::string P4A::ReadToMemory(std::string name)
 {
+    cout << "Reading " << name << " from memory" << endl;
+
     for(int i=0; i<in_fnames.size(); i++)
     {
         if(in_fnames[i] == name)
         {
+            cout << "File found, open buffer" << endl;
+
             ifstream p4(p4a_filename, ios::binary);
-            char buffer[in_fsizes[i]];
+            cout << "Buffer size: " << in_fsizes[i] << " bytes" << endl;
+            string buffer;
+            buffer.resize(in_fsizes[i]);
+            cout << "Allocated char, size: " << buffer.size() << endl;
 
             p4.seekg(in_foffsets[i]);
-            p4.read(buffer,in_fsizes[i]);
+            p4.read(&buffer[0],in_fsizes[i]);
+            cout << "Buffer filled" << endl;
 
             p4.close();
+            cout << "Reading successful" << endl;
             return string(buffer);
         }
     }
 
+    cout << "Can't find file to read from" << endl;
     return "";
 }
 

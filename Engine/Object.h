@@ -17,9 +17,11 @@ class Object
     sf::Sprite s_obj;
 
     float x,y,r=0,rs=0; ///local position
+    float old_x,old_y,old_r; ///old position
     float or_x,or_y; ///origin (for rotation)
     float s_x=1,s_y=1; ///scale
     int layer = 0;
+    int parent = 0;
 
     struct Frame
     {
@@ -37,6 +39,7 @@ class Object
 
     Object();
     void Load(string filename, int xpos, int ypos);
+    void Load(sf::Texture& texture, int xpos, int ypos);
     void SetFrame(float time);
     void SetCustomFrame(float in_time, float in_pos_x, float in_pos_y, float in_or_x, float in_or_y, float in_rotation, float in_scale_x, float in_scale_y);
     void SetPos(float time);

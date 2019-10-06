@@ -75,6 +75,7 @@ class Editor
     Editor();
     std::string OpenFile();
     std::string SaveFile();
+    void setPositions(float time);
     void saveAnim();
     void loadAnim(std::string data, P4A handle);
     void Draw(sf::RenderWindow& window);

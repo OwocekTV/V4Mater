@@ -2,7 +2,7 @@
 
 #include <windows.h>
 #include <iostream>
-#include <cmath>
+#include <math.h>
 #include <sstream>
 #include "Button.h"
 #include "P4A.h"
@@ -110,6 +110,14 @@ string Editor::SaveFile()
 /// WINDOWS.H END ///
 /// ///////////// ///
 
+void Editor::setPositions(float time)
+{
+    for(int i=0; i<objects.size(); i++)
+    {
+        objects[i].SetPos(timeline.cur_pos);
+    }
+}
+
 void Editor::saveAnim()
 {
     ofstream anim(directory+"data.anim", ios::binary);
@@ -172,7 +180,7 @@ void Editor::loadAnim(std::string data, P4A handle)
         {
             if(version == "1.00")
             {
-                cout << "[READ " << version << "]: " << line << endl;
+                //cout << "[READ " << version << "]: " << line << endl;
 
                 if(line.find("S:") != std::string::npos)
                 {
@@ -182,15 +190,37 @@ void Editor::loadAnim(std::string data, P4A handle)
 
                 if(line.find("OI:") != std::string::npos)
                 {
-                    string tex_file = line.substr(line.find_first_of(":")+1);
+                    string objectdata = line.substr(line.find_first_of(":")+1);
+                    vector<string> object = split(objectdata,',');
+
+                    string tex_file = object[0];
                     handle.Extract(tex_file);
 
+                    int parent = atoi(object[1].c_str())*2;
+
                     Object tmp;
+                    sf::Image b;
+                    b.create(1,1,sf::Color(0,0,0,0));
+                    sf::Texture tb;
+                    tb.loadFromImage(b);
                     tmp.Load(tex_file,0,0);
+                    //tmp.Load(tb,0,0);
                     tmp.layer = objects.size();
+                    tmp.parent = parent;
                     objects.push_back(tmp);
 
                     cout << "Added new object from " << tex_file << endl;
+
+                    Object red;
+                    sf::Image r;
+                    r.create(2,2,sf::Color::Red);
+                    sf::Texture t;
+                    t.loadFromImage(r);
+                    red.Load(t,0,0);
+                    red.layer = objects.size();
+                    red.parent = parent+1;
+                    objects.push_back(red);
+
                 }
 
                 if(line.find("F:") != std::string::npos)
@@ -210,16 +240,14 @@ void Editor::loadAnim(std::string data, P4A handle)
                     float or_y = atof(frame[7].c_str());
                     float scale_x = atof(frame[8].c_str());
                     float scale_y = atof(frame[9].c_str());
-                    objects[objectID].SetCustomFrame(time,pos_x,pos_y,or_x,or_y,rotation,scale_x,scale_y);
+                    objects[objectID*2].SetCustomFrame(time,pos_x,pos_y,or_x,or_y,rotation,scale_x,scale_y);
+                    objects[objectID*2+1].SetCustomFrame(time,pos_x,pos_y,1,1,rotation,scale_x,scale_y);
                 }
             }
         }
     }
 
-    for(int i=0; i<objects.size(); i++)
-    {
-        objects[i].SetPos(timeline.cur_pos);
-    }
+    setPositions(0);
 }
 
 void Editor::Draw(sf::RenderWindow& window)
@@ -253,15 +281,22 @@ void Editor::Draw(sf::RenderWindow& window)
         {
             vector<int> objects_clicked;
 
+            ///Calculate object's position based on the timeline
+            if(timeline_old != timeline.cur_pos)
+            {
+                //objects[i].SetPos(timeline.cur_pos);
+                setPositions(timeline.cur_pos);
+            }
+
             for(int i=0; i<objects.size(); i++)
             {
-                if(mouseX > objects[i].x - objects[i].or_x)
+                if(mouseX > objects[i].x - objects[i].s_obj.getGlobalBounds().width/2)
                 {
-                    if(mouseX < objects[i].x + objects[i].or_x)
+                    if(mouseX < objects[i].x + objects[i].s_obj.getGlobalBounds().width/2)
                     {
-                        if(mouseY > objects[i].y - objects[i].or_y)
+                        if(mouseY > objects[i].y - objects[i].s_obj.getGlobalBounds().height/2)
                         {
-                            if(mouseY < objects[i].y + objects[i].or_y)
+                            if(mouseY < objects[i].y + objects[i].s_obj.getGlobalBounds().height/2)
                             {
                                 if(mouseLeftClick == true)
                                 {
@@ -270,12 +305,6 @@ void Editor::Draw(sf::RenderWindow& window)
                             }
                         }
                     }
-                }
-
-                ///Calculate object's position based on the timeline
-                if(timeline_old != timeline.cur_pos)
-                {
-                    objects[i].SetPos(timeline.cur_pos);
                 }
 
                 objects[i].Draw(window);
@@ -354,6 +383,36 @@ void Editor::Draw(sf::RenderWindow& window)
                             }
 
                             cout << objects[object_selected].r << endl;
+                        }
+
+                        if(allowScale)
+                        {
+                            if(!object_offset)
+                            {
+                                object_offset = true;
+                            }
+
+                            if(keyMap[sf::Keyboard::Up])
+                            {
+                                objects[object_selected].s_y -= float(1) / fps;
+                            }
+
+                            if(keyMap[sf::Keyboard::Down])
+                            {
+                                objects[object_selected].s_y += float(1) / fps;
+                            }
+
+                            if(keyMap[sf::Keyboard::Left])
+                            {
+                                objects[object_selected].s_x -= float(1) / fps;
+                            }
+
+                            if(keyMap[sf::Keyboard::Right])
+                            {
+                                objects[object_selected].s_x += float(1) / fps;
+                            }
+
+                            cout << objects[object_selected].s_x << " " << objects[object_selected].s_y << endl;
                         }
                     }
                 }
@@ -531,12 +590,12 @@ void Editor::Draw(sf::RenderWindow& window)
                                 if(buttons[i].selected)
                                 {
                                     buttons[i].setSelected(false);
-                                    allowRotate = false;
+                                    allowScale = false;
                                 }
                                 else
                                 {
                                     buttons[i].setSelected(true);
-                                    allowRotate = true;
+                                    allowScale = true;
                                 }
 
                                 buttons[5].setSelected(false);
@@ -555,12 +614,12 @@ void Editor::Draw(sf::RenderWindow& window)
                                 if(buttons[i].selected)
                                 {
                                     buttons[i].setSelected(false);
-                                    allowRotate = false;
+                                    allowOrigin = false;
                                 }
                                 else
                                 {
                                     buttons[i].setSelected(true);
-                                    allowRotate = true;
+                                    allowOrigin = true;
                                 }
 
                                 buttons[5].setSelected(false);
