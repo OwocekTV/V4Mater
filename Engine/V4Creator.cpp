@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "V4Creator.h"
+#include "Editor.h"
 
 using namespace std;
 
@@ -90,6 +91,9 @@ void V4Creator::Init()
         editor.mouseRightClick = mouseRightClick;
         editor.fps = fps;
         editor.Draw(window);
+
+        if(editor.mouseLeftClick == false)
+        mouseLeftClick = false;
 
         window.display();
 

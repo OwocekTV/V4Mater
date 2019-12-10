@@ -47,6 +47,36 @@ Editor::Editor()
     t_logo.setFillColor(sf::Color::Black);
     t_newfile.setFillColor(sf::Color::Black);
     t_loadfile.setFillColor(sf::Color::Black);
+
+    tex_animmgr.loadFromFile("resources/ui/anim_manager.png");
+    tex_animnew.loadFromFile("resources/ui/anim_new.png");
+    tex_animrmv.loadFromFile("resources/ui/anim_remove.png");
+    tex_animrow.loadFromFile("resources/ui/anim_row.png");
+    tex_mdlmgr.loadFromFile("resources/ui/model_manager.png");
+
+    s_animmgr.setTexture(tex_animmgr);
+    s_animmgr.setOrigin(s_animmgr.getGlobalBounds().width/2,s_animmgr.getGlobalBounds().height/2);
+
+    s_animnew.setTexture(tex_animnew);
+    s_animnew.setOrigin(s_animnew.getGlobalBounds().width/2,s_animnew.getGlobalBounds().height/2);
+
+    s_mdlmgr.setTexture(tex_mdlmgr);
+    s_mdlmgr.setOrigin(s_mdlmgr.getGlobalBounds().width/2,s_mdlmgr.getGlobalBounds().height/2);
+
+    ///sample, temporary animations
+    Animation temp;
+    temp.a_begin = 0.0;
+    temp.a_end = 4.6935;
+    temp.a_name = "animation";
+
+    animations.push_back(temp);
+    animations.push_back(temp);
+    animations.push_back(temp);
+    animations.push_back(temp);
+    animations.push_back(temp);
+    animations.push_back(temp);
+    animations.push_back(temp);
+    animations.push_back(temp);
 }
 
 /// /////////////// ///
@@ -180,7 +210,7 @@ void Editor::loadAnim(std::string data, P4A handle)
         {
             if(version == "1.00")
             {
-                //cout << "[READ " << version << "]: " << line << endl;
+                cout << "[READ " << version << "]: " << line << endl;
 
                 if(line.find("S:") != std::string::npos)
                 {
@@ -196,6 +226,9 @@ void Editor::loadAnim(std::string data, P4A handle)
                     string tex_file = object[0];
                     handle.Extract(tex_file);
 
+                    int parent = -1;
+
+                    if(object.size() > 1)
                     int parent = atoi(object[1].c_str())*2;
 
                     Object tmp;
@@ -211,6 +244,8 @@ void Editor::loadAnim(std::string data, P4A handle)
 
                     cout << "Added new object from " << tex_file << endl;
 
+                    /*
+                    markings
                     Object red;
                     sf::Image r;
                     r.create(2,2,sf::Color::Red);
@@ -219,7 +254,7 @@ void Editor::loadAnim(std::string data, P4A handle)
                     red.Load(t,0,0);
                     red.layer = objects.size();
                     red.parent = parent+1;
-                    objects.push_back(red);
+                    objects.push_back(red);*/
 
                 }
 
@@ -537,6 +572,28 @@ void Editor::Draw(sf::RenderWindow& window)
                                 break;
                             }
 
+                            ///Model manager
+                            case 3:
+                            {
+                                if(guiMode != 1)
+                                guiMode = 1;
+                                else
+                                guiMode = 0;
+
+                                break;
+                            }
+
+                            ///Animation manager
+                            case 4:
+                            {
+                                if(guiMode != 2)
+                                guiMode = 2;
+                                else
+                                guiMode = 0;
+
+                                break;
+                            }
+
                             case 5: ///Selection Tool
                             {
                                 if(buttons[i].selected)
@@ -741,5 +798,98 @@ void Editor::Draw(sf::RenderWindow& window)
         timeline.mouseY = mouseY;
         timeline.mouseLeftClick = mouseLeftClick;
         timeline.Draw(window);
+
+        /// ///////////////////////////// ///
+        /// ///////// GUI Menus ///////// ///
+        /// ///////////////////////////// ///
+
+        if(guiMode == 1)
+        {
+            s_animmgr.setPosition(window.getSize().x/2,window.getSize().y/2-40);
+            window.draw(s_animmgr);
+
+            for(int i=0; i<7; i++)
+            {
+                if(animations.size() > i+animScroll)
+                {
+                    s_animrow[i].setTexture(tex_animrow);
+                    s_animrow[i].setOrigin(s_animrow[i].getGlobalBounds().width/2,s_animrow[i].getGlobalBounds().height/2);
+                    s_animrow[i].setPosition(s_animmgr.getPosition().x,s_animmgr.getPosition().y-114 + (51.5*i));
+
+                    s_animrow_nm[i].setFont(font);
+                    s_animrow_nm[i].setCharacterSize(30);
+                    s_animrow_nm[i].setFillColor(sf::Color::Black);
+                    s_animrow_nm[i].setString(animations[i+animScroll].a_name);
+                    s_animrow_nm[i].setOrigin(0,s_animrow_nm[i].getGlobalBounds().height/2);
+                    s_animrow_nm[i].setPosition(s_animrow[i].getPosition().x-s_animrow[i].getGlobalBounds().width/2+6,s_animrow[i].getPosition().y-7);
+
+                    s_animrow_bg[i].setFont(font);
+                    s_animrow_bg[i].setCharacterSize(30);
+                    s_animrow_bg[i].setFillColor(sf::Color::Black);
+                    s_animrow_bg[i].setString(to_string_with_precision2(animations[i+animScroll].a_begin,6));
+                    s_animrow_bg[i].setOrigin(0,s_animrow_bg[i].getGlobalBounds().height/2);
+                    s_animrow_bg[i].setPosition(s_animrow[i].getPosition().x-s_animrow[i].getGlobalBounds().width/2+178,s_animrow[i].getPosition().y-7);
+
+                    s_animrow_en[i].setFont(font);
+                    s_animrow_en[i].setCharacterSize(30);
+                    s_animrow_en[i].setFillColor(sf::Color::Black);
+                    s_animrow_en[i].setString(to_string_with_precision2(animations[i+animScroll].a_end,6));
+                    s_animrow_en[i].setOrigin(0,s_animrow_en[i].getGlobalBounds().height/2);
+                    s_animrow_en[i].setPosition(s_animrow[i].getPosition().x+74,s_animrow[i].getPosition().y-7);
+
+                    s_animrmv[i].setTexture(tex_animrmv);
+                    s_animrmv[i].setOrigin(s_animrmv[i].getGlobalBounds().width/2,s_animrmv[i].getGlobalBounds().height/2);
+                    s_animrmv[i].setPosition(s_animmgr.getPosition().x+282,s_animmgr.getPosition().y-114 + (51.5*i));
+
+                    s_animrmv[i].setColor(sf::Color::Black);
+
+                    if(mouseX > s_animrmv[i].getPosition().x-s_animrmv[i].getGlobalBounds().width/2)
+                    {
+                        if(mouseX < s_animrmv[i].getPosition().x+s_animrmv[i].getGlobalBounds().width/2)
+                        {
+                            if(mouseY > s_animrmv[i].getPosition().y-s_animrmv[i].getGlobalBounds().height/2)
+                            {
+                                if(mouseY < s_animrmv[i].getPosition().y+s_animrmv[i].getGlobalBounds().height/2)
+                                {
+                                    s_animrmv[i].setColor(sf::Color(0,255,0,128));
+                                    cout << "a" << i << endl;
+
+                                    if(mouseLeftClick)
+                                    {
+                                        animations[i+animScroll].del = true;
+                                        mouseLeftClick = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    window.draw(s_animrow[i]);
+                    window.draw(s_animrow_nm[i]);
+                    window.draw(s_animrow_bg[i]);
+                    window.draw(s_animrow_en[i]);
+                    window.draw(s_animrmv[i]);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            vector<Animation> new_animations;
+
+            for(int i=0; i<animations.size(); i++)
+            {
+                if(!animations[i].del)
+                new_animations.push_back(animations[i]);
+            }
+
+            animations = new_animations;
+        }
+        else if(guiMode == 2)
+        {
+            s_mdlmgr.setPosition(window.getSize().x/2,window.getSize().y/2-40);
+            window.draw(s_mdlmgr);
+        }
     }
 }

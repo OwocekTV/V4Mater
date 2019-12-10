@@ -64,6 +64,28 @@ class Editor
     bool allowScale = false;
     bool allowOrigin = false;
 
+    int guiMode = 0; ///0 - nothing, 1 - model settings, 2 - animation manager
+    int animScroll = 0;
+
+    struct Animation
+    {
+        string a_name;
+        float a_begin;
+        float a_end;
+        bool del = false;
+    };
+
+    std::vector<Animation> animations;
+
+    sf::Texture tex_animmgr,tex_animnew,tex_animrmv,tex_animrow;
+    sf::Texture tex_mdlmgr;
+
+    sf::Sprite s_animmgr,s_animnew;
+    sf::Sprite s_mdlmgr;
+
+    sf::Sprite s_animrow[7],s_animrmv[7];
+    sf::Text s_animrow_bg[7],s_animrow_en[7],s_animrow_nm[7];
+
     ///TEMPORARY
     float oldrot = 0;
 
