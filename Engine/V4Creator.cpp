@@ -98,6 +98,10 @@ void V4Creator::Init()
         window.display();
 
         keyMap[sf::Keyboard::S] = false;
+        keyMap[sf::Keyboard::E] = false;
+        keyMap[sf::Keyboard::N] = false;
+        keyMap[sf::Keyboard::C] = false;
+        keyMap[sf::Keyboard::Enter] = false;
         //keyMap.clear();
     }
 }

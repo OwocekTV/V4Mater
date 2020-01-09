@@ -67,6 +67,12 @@ class Editor
     int guiMode = 0; ///0 - nothing, 1 - model settings, 2 - animation manager
     int animScroll = 0;
 
+    bool createAnimMode = false;
+
+    float temp_newAnimStart = 0;
+    float temp_newAnimEnd = 0;
+    string temp_newAnimName = "";
+
     struct Animation
     {
         string a_name;

@@ -64,7 +64,7 @@ Editor::Editor()
     s_mdlmgr.setOrigin(s_mdlmgr.getGlobalBounds().width/2,s_mdlmgr.getGlobalBounds().height/2);
 
     ///sample, temporary animations
-    Animation temp;
+    /*Animation temp;
     temp.a_begin = 0.0;
     temp.a_end = 4.6935;
     temp.a_name = "animation";
@@ -76,7 +76,7 @@ Editor::Editor()
     animations.push_back(temp);
     animations.push_back(temp);
     animations.push_back(temp);
-    animations.push_back(temp);
+    animations.push_back(temp);*/
 }
 
 /// /////////////// ///
@@ -150,6 +150,16 @@ void Editor::setPositions(float time)
 
 void Editor::saveAnim()
 {
+    ///S: - animation settings
+
+    ///OI: - create object
+    ///F: - object frame
+
+    ///HB: - hitbox object
+    ///HBF: - hitbox frame
+
+    ///A: - animation segment
+
     ofstream anim(directory+"data.anim", ios::binary);
 
     ///Save header with version
@@ -157,6 +167,12 @@ void Editor::saveAnim()
 
     ///Save initial animation settings
     anim << "S:" << to_string_with_precision2(max_time,6) << "\n";
+
+    ///Save existing animations
+    for(int i=0; i<animations.size(); i++)
+    {
+        anim << "A:" << to_string_with_precision2(animations[i].a_begin,6) << "," << to_string_with_precision2(animations[i].a_end,6) << "," << animations[i].a_name << "\n";
+    }
 
     ///Save object creation
     for(int i=0; i<objects.size(); i++)
@@ -575,8 +591,8 @@ void Editor::Draw(sf::RenderWindow& window)
                             ///Model manager
                             case 3:
                             {
-                                if(guiMode != 1)
-                                guiMode = 1;
+                                if(guiMode != 2)
+                                guiMode = 2;
                                 else
                                 guiMode = 0;
 
@@ -586,8 +602,8 @@ void Editor::Draw(sf::RenderWindow& window)
                             ///Animation manager
                             case 4:
                             {
-                                if(guiMode != 2)
-                                guiMode = 2;
+                                if(guiMode != 1)
+                                guiMode = 1;
                                 else
                                 guiMode = 0;
 
@@ -805,6 +821,49 @@ void Editor::Draw(sf::RenderWindow& window)
 
         if(guiMode == 1)
         {
+            //cout << timeline.cur_pos << endl;
+
+            if(keyMap[sf::Keyboard::C])
+            {
+                ///TEMPORARY!!
+                createAnimMode = true;
+                cout << "Creating new animation, waiting for input" << endl;
+            }
+
+            if(createAnimMode)
+            {
+                if(keyMap[sf::Keyboard::S])
+                {
+                    temp_newAnimStart = timeline.cur_pos;
+                    cout << "Animation starts at " << timeline.cur_pos << endl;
+                }
+
+                if(keyMap[sf::Keyboard::E])
+                {
+                    temp_newAnimEnd = timeline.cur_pos;
+                    cout << "Animation ends at " << timeline.cur_pos << endl;
+                }
+
+                if(keyMap[sf::Keyboard::N])
+                {
+                    cout << "Put animation name here: ";
+                    cin >> temp_newAnimName;
+                }
+
+                if(keyMap[sf::Keyboard::Enter])
+                {
+                    Animation temp;
+                    temp.a_begin = temp_newAnimStart;
+                    temp.a_end = temp_newAnimEnd;
+                    temp.a_name = temp_newAnimName;
+
+                    animations.push_back(temp);
+
+                    createAnimMode = false;
+                }
+            }
+
+
             s_animmgr.setPosition(window.getSize().x/2,window.getSize().y/2-40);
             window.draw(s_animmgr);
 
