@@ -6,11 +6,15 @@
 #include "Object.h"
 #include "Button.h"
 #include "Timeline.h"
+#include "AnimatedObject.h"
 
 class Editor
 {
     public:
     std::map<int,bool> keyMap;
+
+    AnimatedObject animatedObject;
+    bool ao_loaded = false;
 
     sf::Font font;
     sf::Text t_logo;
@@ -27,8 +31,6 @@ class Editor
     int RMB_x = 0, RMB_y = 0;
     int LMB_x = 0, LMB_y = 0;
     sf::View view;
-
-    std::vector<Object> objects;
 
     sf::RectangleShape r_outline;
 
@@ -69,20 +71,6 @@ class Editor
 
     bool createAnimMode = false;
 
-    float temp_newAnimStart = 0;
-    float temp_newAnimEnd = 0;
-    string temp_newAnimName = "";
-
-    struct Animation
-    {
-        string a_name;
-        float a_begin;
-        float a_end;
-        bool del = false;
-    };
-
-    std::vector<Animation> animations;
-
     sf::Texture tex_animmgr,tex_animnew,tex_animrmv,tex_animrow;
     sf::Texture tex_mdlmgr;
 
@@ -103,9 +91,8 @@ class Editor
     Editor();
     std::string OpenFile();
     std::string SaveFile();
-    void setPositions(float time);
     void saveAnim();
-    void loadAnim(std::string data, P4A handle);
+    void loadAnim();
     void Draw(sf::RenderWindow& window);
 };
 

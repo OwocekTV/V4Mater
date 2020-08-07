@@ -8,11 +8,30 @@ Object::Object()
 
 }
 
+Object::Object(std::string mem, int xpos, int ypos, int l, int p)
+{
+    //cout << "Obtained a memory file of size " << mem.size() << " bytes" << endl;
+
+    tex_obj.loadFromMemory(mem.data(),mem.size());
+    tex_obj.setSmooth(true);
+
+    s_obj.setTexture(tex_obj);
+
+    or_x = s_obj.getGlobalBounds().width/2;
+    or_y = s_obj.getGlobalBounds().height/2;
+
+    x = xpos;
+    y = ypos;
+
+    layer = l;
+    parent = p;
+}
+
 void Object::Load(string filename, int xpos, int ypos)
 {
-    cout << "Loading object" << endl;
+    //cout << "Loading object" << endl;
     texture_path = filename.substr(filename.find_last_of("\\/")+1);
-    cout << "Texture path: " << texture_path << endl;
+    //cout << "Texture path: " << texture_path << endl;
 
     if(tex_obj.loadFromFile(filename))
     {
@@ -24,7 +43,9 @@ void Object::Load(string filename, int xpos, int ypos)
         x = xpos;
         y = ypos;
 
-        cout << "Object loaded successfully" << endl;
+        exported = false;
+
+        //cout << "Object loaded successfully" << endl;
     }
 }
 
@@ -39,7 +60,62 @@ void Object::Load(sf::Texture& texture, int xpos, int ypos)
     x = xpos;
     y = ypos;
 
-    cout << "Object loaded successfully" << endl;
+    exported = false;
+
+    //cout << "Object loaded successfully" << endl;
+}
+
+
+void Object::LoadFromMemory(std::string mem, int xpos, int ypos)
+{
+    tex_obj.loadFromMemory(mem.data(),mem.size());
+    tex_obj.setSmooth(true);
+
+    s_obj.setTexture(tex_obj);
+
+    or_x = s_obj.getGlobalBounds().width/2;
+    or_y = s_obj.getGlobalBounds().height/2;
+
+    x = xpos;
+    y = ypos;
+
+    exported = false;
+
+    //cout << "Object loaded successfully" << endl;
+}
+
+void Object::swapTexture(sf::Image img)
+{
+    //cout << "[Object] Object::swapTexture(): " << texture_path << endl;
+
+    sf::Clock c;
+    s_obj.t.loadFromImage(img);
+    //cout << c.getElapsedTime().asMicroseconds() << "us ";
+    s_obj.t.setSmooth(true);
+    //cout << c.getElapsedTime().asMicroseconds() << "us ";
+    s_obj.applyTexture();
+    //cout << c.getElapsedTime().asMicroseconds() << "us" << endl;;
+}
+
+void Object::swapTexture(sf::Image first, vector<Pixel> px)
+{
+    //cout << "[Object] Object::swapTexture(): " << texture_path << endl;
+
+    //sf::Clock c;
+
+    sf::Image nw = first;
+    //cout << c.getElapsedTime().asMicroseconds() << "us ";
+    for(int i=0; i<px.size(); i++)
+    {
+        nw.setPixel(px[i].x, px[i].y, px[i].color);
+    }
+    //cout << c.getElapsedTime().asMicroseconds() << "us ";
+    s_obj.t.loadFromImage(nw);
+    //cout << c.getElapsedTime().asMicroseconds() << "us ";
+    s_obj.t.setSmooth(true);
+    //cout << c.getElapsedTime().asMicroseconds() << "us ";
+    s_obj.applyTexture();
+    //cout << c.getElapsedTime().asMicroseconds() << "us" << endl;;
 }
 
 void Object::SetFrame(float time)
@@ -113,6 +189,11 @@ void Object::SetPos(float time)
                     s_x = frames[i].scale_x + ((frames[i+1].scale_x - frames[i].scale_x) * time_percentage);
                     s_y = frames[i].scale_y + ((frames[i+1].scale_y - frames[i].scale_y) * time_percentage);
 
+                    if(frames[i+1].pos_x == -999999)
+                    disable = true;
+                    else
+                    disable = false;
+
                     break;
                 }
                 else
@@ -131,6 +212,11 @@ void Object::SetPos(float time)
                     or_y = frames[frames.size()-1].or_y;
                     s_x = frames[frames.size()-1].scale_x;
                     s_y = frames[frames.size()-1].scale_y;
+
+                    if(frames[frames.size()-1].pos_x == -999999)
+                    disable = true;
+                    else
+                    disable = false;
                 }
             }
             else
@@ -149,6 +235,11 @@ void Object::SetPos(float time)
                 or_y = frames[i].or_y;
                 s_x = frames[i].scale_x;
                 s_y = frames[i].scale_y;
+
+                if(frames[i].pos_x == -999999)
+                disable = true;
+                else
+                disable = false;
 
                 break;
             }
@@ -170,6 +261,11 @@ void Object::SetPos(float time)
             s_x = frames[i].scale_x;
             s_y = frames[i].scale_y;
 
+            if(frames[i].pos_x == -999999)
+            disable = true;
+            else
+            disable = false;
+
             break;
         }
     }
@@ -177,13 +273,62 @@ void Object::SetPos(float time)
    // cout << x << " " << y << " " << r << " " << or_x << " " << or_y << " " << s_x << " " << s_y << endl;
 }
 
-void Object::Draw(sf::RenderWindow& window)
+void Object::Draw(sf::RenderWindow& window, int orx, int ory)
 {
-    s_obj.setTexture(tex_obj);
-    s_obj.setScale(s_x,s_y);
-    s_obj.setOrigin(or_x,or_y);
-    s_obj.setPosition(x,y);
-    s_obj.setRotation(r);
-    s_obj.move(256,256);
-    window.draw(s_obj);
+    if(!disable)
+    {
+        //s_obj.setTexture(tex_obj);
+        s_obj.setScale(s_x+(g_sx-1),s_y+(g_sy-1));
+        s_obj.setOrigin(or_x+orx, or_y+ory);
+        s_obj.setPosition(x+g_x+gl_x,y+g_y+gl_y);
+        s_obj.setRotation(g_r+r);
+        s_obj.setColor(color);
+        s_obj.draw(window);
+
+
+        if((sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) && (sf::Keyboard::isKeyPressed(sf::Keyboard::F9)))
+        {
+            if(!exported)
+            {
+                sf::Image img;
+                img = s_obj.t.copyToImage();
+                int rrr = rand() % 100000000;
+                img.saveToFile("texDump/obj_"+std::to_string(rrr)+".png");
+
+                exported = true;
+            }
+        }
+    }
+}
+
+
+void Object::Draw(sf::RenderWindow& window, int x1, int y1, int x2, int y2, int orx, int ory)
+{
+    if(!disable)
+    {
+        //cout << x1 << " " << y1 << " " << x2 << " " << y2 << endl;
+        s_obj.setTextureRect(sf::IntRect(x1,y1,x2,y2));
+
+        //s_obj.setTexture(tex_obj);
+        s_obj.setScale(s_x+(g_sx-1),s_y+(g_sy-1));
+        s_obj.setOrigin(or_x+orx, or_y+ory);
+        s_obj.setPosition(x+g_x+gl_x,y+g_y+gl_y);
+        s_obj.setRotation(g_r+r);
+        s_obj.setColor(color);
+        s_obj.draw(window);
+
+
+        if((sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) && (sf::Keyboard::isKeyPressed(sf::Keyboard::F9)))
+        {
+            if(!exported)
+            {
+                sf::Image img;
+                img = s_obj.t.copyToImage();
+                int rrr = rand() % 100000000;
+                img.saveToFile("texDump/obj_"+std::to_string(rrr)+".png");
+
+                exported = true;
+            }
+        }
+    }
 }

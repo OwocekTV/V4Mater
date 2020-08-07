@@ -1,4 +1,5 @@
 #include "P4A.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -129,6 +130,8 @@ void P4A::ReadDictionary(std::string filename)
 {
     p4a_filename = filename;
 
+    cout << "[P4A] Reading " << p4a_filename << endl;
+
     ifstream file(filename, std::ifstream::binary);
 
     char header[3];
@@ -187,7 +190,7 @@ void P4A::ReadDictionary(std::string filename)
                 string str_filename(file_name);
                 str_filename = str_filename.substr(0,filename_length);
 
-                cout << "Filename: " << str_filename << endl;
+                //cout << "Filename: " << str_filename << endl;
                 in_fnames.push_back(str_filename);
 
                 p4a_offset += filename_length;
@@ -196,7 +199,7 @@ void P4A::ReadDictionary(std::string filename)
 
                 file.seekg(p4a_offset);
                 file.read(reinterpret_cast<char*>(&file_offset), 4);
-                cout << "File offset: " << file_offset << endl;
+                //cout << "File offset: " << file_offset << endl;
                 in_foffsets.push_back(file_offset);
 
                 p4a_offset += 4;
@@ -205,11 +208,14 @@ void P4A::ReadDictionary(std::string filename)
 
                 file.seekg(p4a_offset);
                 file.read(reinterpret_cast<char*>(&file_size), 4);
-                cout << "File size: " << file_size << endl;
+                //cout << "File size: " << file_size << endl;
                 in_fsizes.push_back(file_size);
 
                 p4a_offset += 4;
             }
+
+            file.seekg(0);
+            bin_data = std::vector<char>(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
         }
         else
         {
@@ -227,32 +233,25 @@ void P4A::ReadDictionary(std::string filename)
 
 std::string P4A::ReadToMemory(std::string name)
 {
-    cout << "Reading " << name << " from memory" << endl;
+    //cout << "Reading " << name << " from memory" << endl;
 
-    for(int i=0; i<in_fnames.size(); i++)
-    {
-        if(in_fnames[i] == name)
-        {
-            cout << "File found, open buffer" << endl;
+    int i = std::distance(in_fnames.begin(), std::find(in_fnames.begin(), in_fnames.end(), name));
 
-            ifstream p4(p4a_filename, ios::binary);
-            cout << "Buffer size: " << in_fsizes[i] << " bytes" << endl;
-            string buffer;
-            buffer.resize(in_fsizes[i]);
-            cout << "Allocated char, size: " << buffer.size() << endl;
+    vector<char>::const_iterator first = bin_data.begin() + in_foffsets[i];
+    vector<char>::const_iterator last = bin_data.begin() + in_foffsets[i] + in_fsizes[i];
+    vector<char> cut_data(first, last);
 
-            p4.seekg(in_foffsets[i]);
-            p4.read(&buffer[0],in_fsizes[i]);
-            cout << "Buffer filled" << endl;
+    return string(cut_data.begin(), cut_data.end());
+}
 
-            p4.close();
-            cout << "Reading successful" << endl;
-            return string(buffer);
-        }
-    }
+vector<char> P4A::ReadToMemoryChar(std::string name)
+{
+    int i = std::distance(in_fnames.begin(), std::find(in_fnames.begin(), in_fnames.end(), name));
 
-    cout << "Can't find file to read from" << endl;
-    return "";
+    vector<char>::const_iterator first = bin_data.begin() + in_foffsets[i];
+    vector<char>::const_iterator last = bin_data.begin() + in_foffsets[i] + in_fsizes[i];
+
+    return vector<char>(first, last);
 }
 
 void P4A::Extract(std::string name)
